@@ -1,0 +1,644 @@
+---
+title: "Exercise 1"
+author: "David Jorgensen"
+date: "2024-06-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# R Tutorial
+
+## R Get Started
+```{r tutorial_getstarted, cache=TRUE}
+5 + 5
+```
+
+## R Syntax
+### Syntax
+```{r tutorial_syntax_syntax_1, cache=TRUE}
+"Hello World!"
+```
+```{r tutorial_syntax_syntax_2, cache=TRUE}
+5
+10
+25
+```
+```{r tutorial_syntax_syntax_3, cache=TRUE}
+5 + 5
+```
+
+### Print
+```{r tutorial_syntax_print_1, cache=TRUE}
+"Hello World!"
+```
+```{r tutorial_syntax_print_2, cache=TRUE}
+print("Hello World!")
+```
+```{r tutorial_syntax_print_3, cache=TRUE}
+for (x in 1:10) {
+  print(x)
+}
+```
+
+## R Comments
+```{r tutorial_comments_1, cache=TRUE}
+# This is a comment
+"Hello World!"
+```
+```{r tutorial_comments_2, cache=TRUE}
+"Hello World!" # This is a comment
+```
+```{r tutorial_comments_3, cache=TRUE}
+# "Good morning!"
+"Good night!"
+```
+
+## R Variables
+### Variables
+#### Creating Variables in R
+```{r tutorial_variables_variables_creatingvariables, cache=TRUE}
+name <- "John"
+age <- 40
+
+name   # output "John"
+age    # output 40
+```
+
+#### Print / Output Variables
+```{r tutorial_variables_variables_printoutputvariables_1, cache=TRUE}
+name <- "John Doe"
+
+name # auto-print the value of the name variable
+```
+```{r tutorial_variables_variables_printoutputvariables_2, cache=TRUE}
+name <- "John Doe"
+
+print(name) # print the value of the name variable
+```
+```{r tutorial_variables_variables_printoutputvariables_3, cache=TRUE}
+for (x in 1:10) {
+  print(x)
+}
+```
+
+### Concatenate Elements
+```{r tutorial_variables_concatenateelements_1, cache=TRUE}
+text <- "awesome"
+
+paste("R is", text)
+```
+```{r tutorial_variables_concatenateelements_2, cache=TRUE}
+text1 <- "R is"
+text2 <- "awesome"
+
+paste(text1, text2)
+```
+```{r tutorial_variables_concatenateelements_3, cache=TRUE}
+num1 <- 5
+num2 <- 10
+
+num1 + num2
+```
+```{r tutorial_variables_concatenateelements_4, cache=TRUE, eval=FALSE}
+num <- 5
+text <- "Some text"
+
+num + text
+```
+
+### Multiple Variables
+```{r tutorial_variables_multiplevariables_1, cache=TRUE}
+# Assign the same value to multiple variables in one line
+var1 <- var2 <- var3 <- "Orange"
+
+# Print variable values
+var1
+var2
+var3
+```
+
+### Variable Names
+```{r tutorial_variables_variablenames_1, cache=TRUE, eval=FALSE}
+# Legal variable names:
+myvar <- "John"
+my_var <- "John"
+myVar <- "John"
+MYVAR <- "John"
+myvar2 <- "John"
+.myvar <- "John"
+
+# Illegal variable names:
+2myvar <- "John"
+my-var <- "John"
+my var <- "John"
+_my_var <- "John"
+my_v@ar <- "John"
+TRUE <- "John"
+```
+
+## R Data Types
+#### Data Types
+```{r tutorial_datatypes_datatypes, cache=TRUE}
+my_var <- 30 # my_var is type of numeric
+my_var <- "Sally" # my_var is now of type character (aka string)
+```
+#### Basic Data Types
+```{r tutorial_datatypes_basicdatatypes, cache=TRUE}
+# numeric
+x <- 10.5
+class(x)
+
+# integer
+x <- 1000L
+class(x)
+
+# complex
+x <- 9i + 3
+class(x)
+
+# character/string
+x <- "R is exciting"
+class(x)
+
+# logical/boolean
+x <- TRUE
+class(x)
+```
+
+## R Numbers
+#### Numbers
+```{r tutorial_numbers_numbers, cache=TRUE}
+x <- 10.5   # numeric
+y <- 10L    # integer
+z <- 1i     # complex
+```
+#### Numeric
+```{r tutorial_numbers_numeric, cache=TRUE}
+x <- 10.5
+y <- 55
+
+# Print values of x and y
+x
+y
+
+# Print the class name of x and y
+class(x)
+class(y)
+```
+#### Integer
+```{r tutorial_numbers_integer, cache=TRUE}
+x <- 1000L
+y <- 55L
+
+# Print values of x and y
+x
+y
+
+# Print the class name of x and y
+class(x)
+class(y)
+```
+#### Complex
+```{r tutorial_numbers_complex, cache=TRUE}
+x <- 3+5i
+y <- 5i
+
+# Print values of x and y
+x
+y
+
+# Print the class name of x and y
+class(x)
+class(y)
+```
+#### Type Conversion
+```{r tutorial_numbers_typeconversion, cache=TRUE}
+x <- 1L # integer
+y <- 2 # numeric
+
+# convert from integer to numeric:
+a <- as.numeric(x)
+
+# convert from numeric to integer:
+b <- as.integer(y)
+
+# print values of x and y
+x
+y
+
+# print the class name of a and b
+class(a)
+class(b)
+```
+
+## R Math
+#### Simple Math
+```{r tutorial_math_simplemath_1, cache=TRUE}
+10 + 5
+```
+```{r tutorial_math_simplemath_2, cache=TRUE}
+10 - 5
+```
+#### Built-In Math Functions
+```{r tutorial_math_builtinmathfunctions, cache=TRUE}
+max(5, 10, 15)
+
+min(5, 10, 15)
+```
+#### sqrt()
+```{r tutorial_math_sqrt, cache=TRUE}
+sqrt(16)
+```
+#### abs()
+```{r tutorial_math_abs, cache=TRUE}
+abs(-4.7)
+```
+#### ceiling() and floor()
+```{r tutorial_math_ceilingandfloor, cache=TRUE}
+ceiling(1.4)
+
+floor(1.4)
+```
+
+## R Strings
+### Strings
+#### String Literals
+```{r tutorial_strings_strings_stringliterals, cache=TRUE}
+"hello"
+'hello'
+```
+#### Assign a String to a Variable
+```{r tutorial_strings_strings_assignstringtovariable, cache=TRUE}
+str <- "Hello"
+str # print the value of str
+```
+#### Multiline Strings
+```{r tutorial_strings_strings_multilinestrings_1, cache=TRUE}
+str <- "Lorem ipsum dolor sit amet,
+consectetur adipiscing elit,
+sed do eiusmod tempor incididunt
+ut labore et dolore magna aliqua."
+
+str # print the value of str
+```
+```{r tutorial_strings_strings_multilinestrings_2, cache=TRUE}
+str <- "Lorem ipsum dolor sit amet,
+consectetur adipiscing elit,
+sed do eiusmod tempor incididunt
+ut labore et dolore magna aliqua."
+
+cat(str)
+```
+#### String Length
+```{r tutorial_strings_strings_stringlength, cache=TRUE}
+str <- "Hello World!"
+
+nchar(str)
+```
+#### Check String
+```{r tutorial_strings_strings_checkstring, cache=TRUE}
+str <- "Hello World!"
+
+grepl("H", str)
+grepl("Hello", str)
+grepl("X", str)
+```
+#### Combine Two Strings
+```{r tutorial_strings_strings_combinetwostrings, cache=TRUE}
+str1 <- "Hello"
+str2 <- "World"
+
+paste(str1, str2)
+```
+
+### Escape Characters
+```{r tutorial_strings_escapecharacters, cache=TRUE}
+str <- "We are the so-called \"Vikings\", from the north."
+
+str
+cat(str)
+```
+
+## R Booleans
+```{r tutorial_booleans_1, cache=TRUE}
+10 > 9    # TRUE because 10 is greater than 9
+10 == 9   # FALSE because 10 is not equal to 9
+10 < 9    # FALSE because 10 is greater than 9
+```
+```{r tutorial_booleans_2, cache=TRUE}
+a <- 10
+b <- 9
+
+a > b
+```
+```{r tutorial_booleans_3, cache=TRUE}
+a <- 200
+b <- 33
+
+if (b > a) {
+  print ("b is greater than a")
+} else {
+  print("b is not greater than a")
+}
+```
+
+## R Operators
+#### Operators
+```{r tutorial_operators_operators, cache=TRUE}
+10 + 5
+```
+#### Arithmetic Operators
+```{r tutorial_operators_arithmeticoperators, cache=TRUE}
+10 + 5
+10 - 5
+10 * 5
+10 / 5
+2 ^ 5
+5 %% 2
+15 %/% 2
+```
+#### Assignment Operators
+```{r tutorial_operators_assignmentoperators, cache=TRUE}
+my_var <- 3
+
+my_var <<- 3 # global assignment
+
+3 -> my_var
+
+3 ->> my_var # global assignment
+
+my_var # print my_var
+```
+#### Comparison Operators
+```{r tutorial_operators_comparisonoperators, cache=TRUE}
+5 == 5 # TRUE because 5 is equal to 5
+5 == 3 # FALSE because 5 is not equal to 3
+5 != 3 # returns TRUE because 5 is not equal to 3
+5 > 3 # returns TRUE because 5 is greater than 3
+5 < 3 # returns FALSE because 5 is not less than 3
+5 >= 3 # returns TRUE because 5 is greater than, or equal, to 3
+5 <= 3 # returns FALSE because 5 is neither less than or equal to 3
+```
+
+## R If ... Else 
+### If ... Else
+#### Conditions and If Statements
+```{r tutorial_ifelse_ifelse_conditionsandifstatements, cache=TRUE}
+5 == 5 # TRUE because 5 is equal to 5
+5 == 3 # FALSE because 5 is not equal to 3
+5 != 3 # returns TRUE because 5 is not equal to 3
+5 > 3 # returns TRUE because 5 is greater than 3
+5 < 3 # returns FALSE because 5 is not less than 3
+5 >= 3 # returns TRUE because 5 is greater than, or equal, to 3
+5 <= 3 # returns FALSE because 5 is neither less than or equal to 3
+```
+#### If Statement
+```{r tutorial_ifelse_ifelse_ifstatement, cache=TRUE}
+a <- 33
+b <- 200
+
+if (b > a) {
+  print("b is greater than a")
+}
+```
+#### Else If
+```{r tutorial_ifelse_ifelse_elseif, cache=TRUE}
+a <- 33
+b <- 33
+
+if (b > a) {
+  print("b is greater than a")
+} else if (a == b) {
+  print ("a and b are equal")
+}
+```
+#### If Else
+```{r tutorial_ifelse_ifelse_ifelse_1, cache=TRUE}
+a <- 200
+b <- 33
+
+if (b > a) {
+  print("b is greater than a")
+} else if (a == b) {
+  print("a and b are equal")
+} else {
+  print("a is greater than b")
+}
+```
+```{r tutorial_ifelse_ifelse_ifelse_2, cache=TRUE}
+a <- 200
+b <- 33
+
+if (b > a) {
+  print("b is greater than a")
+} else {
+  print("b is not greater than a")
+}
+```
+### Nested If
+```{r tutorial_ifelse_nestedif, cache=TRUE}
+x <- 41
+
+if (x > 10) {
+  print("Above ten")
+  if (x > 20) {
+    print("and also above 20!")
+  } else {
+    print("but not above 20.")
+  }
+} else {
+  print("below 10.")
+}
+```
+### And Or
+#### And
+```{r tutorial_ifelse_andor_and, cache=TRUE}
+a <- 200
+b <- 33
+c <- 500
+
+if (a > b & c > a) {
+  print("Both conditions are true")
+}
+```
+#### Or
+```{r tutorial_ifelse_andor_or, cache=TRUE}
+a <- 200
+b <- 33
+c <- 500
+
+if (a > b | a > c) {
+  print("At least one of the conditions is true")
+}
+```
+
+## R While Loops
+#### While Loops
+```{r tutorial_whileloops_whileloops, cache=TRUE}
+i <- 1
+while (i < 6) {
+  print(i)
+  i <- i + 1
+}
+```
+#### Break
+```{r tutorial_whileloops_break, cache=TRUE}
+i <- 1
+while (i < 6) {
+  print(i)
+  i <- i + 1
+  if (i == 4) {
+    break
+  }
+}
+```
+#### Next
+```{r tutorial_whileloops_next, cache=TRUE}
+i <- 0
+while (i < 6) {
+  i <- i + 1
+  if (i == 3) {
+    next
+  }
+  print(i)
+}
+```
+#### Yahtzee!
+```{r tutorial_whileloops_yahtzee, cache=TRUE}
+dice <- 1
+while (dice <= 6) {
+  if (dice < 6) {
+    print("No Yahtzee")
+  } else {
+    print("Yahtzee!")
+  }
+  dice <- dice + 1
+}
+```
+
+## R For Loop
+### For Loop
+### Nested Loop
+## R Functions
+### Functions
+#### Creating a Function
+#### Call a Function
+#### Arguments
+#### Number of Arguments
+#### Default Parameter value
+#### Return Values
+### Nested Functions
+### Recursion
+### Global Variables
+#### Global Variables
+#### The Global Assignment Operator
+
+# R Data Structures
+## R Data Structures
+#### Data Structures
+#### Vectors
+#### Lists
+#### Matrices
+#### Arrays
+#### Data Frames
+## R Vectors
+#### Vectors 
+#### Vector Length 
+#### Sort a Vector 
+#### Access Vectors 
+#### Change an Item 
+#### Repeat Vectors 
+#### Generating Sequenced Vectors
+## R Lists
+#### Lists 
+#### Access Lists 
+#### Change Item Value 
+#### List Length 
+#### Check if Item Exists 
+#### Add List Items 
+#### Remove List Items 
+#### Range of Indexes 
+#### Loop Through a List 
+#### Join Two Lists
+## R Matrices
+#### Matrices 
+#### Access Matrix Items 
+#### Access More Than One Column 
+#### Add Rows and Columns 
+#### Remove Rows and Columns 
+#### Check if an Item Exists 
+#### Number of Rows and Columns
+#### Matrix Length 
+#### Loop Through a Matrix
+#### Combine Two Matrices
+## R Arrays
+#### Arrays 
+#### Access Array Items
+#### Check if an Item Exists 
+#### Amount of Rows and Columns 
+#### Array Length 
+#### Loop Through an Array
+## R Data Frames
+#### Data Frames 
+#### Summarize the Data 
+#### Access Items 
+#### Add Rows 
+#### Add Columns 
+#### Remove Rows and Columns 
+#### Amount of Rows and Columns 
+#### Data Frame Length
+#### Combining Data Frames
+## R Factors
+#### Factors
+#### Factor Length 
+#### Access Factors 
+#### Change Item Value 
+
+# R Graphics
+## R Plot
+#### Plot
+#### Multiple Points
+#### Sequences of Points 
+#### Draw a Line 
+#### Plot Labels 
+#### Graph Appearance 
+#### Size 
+#### Point Shape
+## R Line
+#### Line Graphs 
+#### Line Color 
+#### Line Width 
+#### Line Styles 
+#### Multiple Lines
+## R Scatterplot
+#### Scatter Plots
+#### Compare Plots
+## R Pie Charts 
+#### Pie Charts
+#### Start Angle 
+#### Labels and Header 
+#### Colors
+#### Legend
+## R Bars
+#### Bar Charts
+#### Bar Color 
+#### Density / Bar Texture
+#### Bar Width 
+#### Horizontal Bars
+
+# R Statistics
+## R Data Set 
+#### Data Set
+#### Information About the Data Set
+#### Get Information 
+#### Print Variable Values 
+#### Sort Variable Values
+#### Analyzing the Data
+## R Max and Min 
+## R Mean Median Mode 
+### Mean 
+### Median 
+### Mode
+## R Percentiles 
