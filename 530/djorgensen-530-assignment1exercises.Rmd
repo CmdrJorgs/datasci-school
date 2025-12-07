@@ -1,0 +1,458 @@
+---
+title: "Exercise 1"
+author: "David Jorgensen"
+date: "2025-12-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# R Syntax
+
+## 1
+_Insert the missing part of the code below to output "Hello World!"._
+```{r syntax_1, cache=TRUE}
+"Hello, World!"
+```
+Added quotes to make it a string.
+
+## 2
+_In R, you can also use a function to output code. Fill in the missing part to output "Hello World!":_
+```{r syntax_2, cache=TRUE}
+print("Hello, World!")
+```
+`print()` feels more similar to other programming language syntax.
+
+## 3
+_Comments in R are written with a special character. Insert the missing part:_
+```{r syntax_3, cache=TRUE}
+# This is a comment
+"Hello World!"
+```
+How meta...
+
+---
+
+# R Variables
+
+## 1
+_Create a variable named carName and assign the value Volvo to it._
+```{r variables_1, cache=TRUE}
+carName <- "Volvo"
+```
+Arrows point the direction of flow.
+
+## 2
+_Create a variable named maxSpeed and assign the value 120 to it._
+```{r variables_2, cache=TRUE}
+maxSpeed <- 120
+```
+Numeric values do not need quotes, they are not strings.
+
+## 3
+_Use the correct function to combine the text "Hello" with the txt variable, to output "Hello World!"._
+```{r variables_3, cache=TRUE}
+txt <- "World!"
+paste("Hello", txt)
+```
+`paste()` combines strings with a space by default.
+
+## 4
+_Display the sum of 5 + 10, using two variables: x and y._
+```{r variables_4, cache=TRUE}
+x <- 5
+y <- 10
+x + y
+```
+Simple arithmetic with variables, pretty straightforward.
+
+## 5
+_Assign the value "Orange" to multiple variables in one line:_
+```{r variables_5, cache=TRUE}
+fruit1 <- fruit2 <- fruit3 <- "Orange"
+```
+Chained assignment works in R, pretty nifty!
+
+---
+
+# R Data Types
+
+## 1
+_What data type is myVar?_
+```{r datatypes_1, cache=TRUE}
+myVar <- 30
+class(myVar)
+```
+`class()` is similar to `type()` in Python or `typeof()` in JavaScript. It should show that myVar is of type "numeric".
+
+## 2
+_Which function can be used to check the data type of a variable?_
+```{r datatypes_2, cache=TRUE}
+x <- 10.5
+class(x)
+```
+Same as above, `class()` reveals the data type.
+
+---
+
+# R Math 
+
+## 1
+_Use the correct function to find the lowest number in a set._
+```{r math_1, cache=TRUE}
+min(5, 10, 15)
+```
+`min()` is pretty self explanatory, find the minimum!
+
+## 2
+_Use the correct function to find the square root of the number 16._
+```{r math_2, cache=TRUE}
+sqrt(16)
+```
+`sqrt()`, again, self explanatory.
+
+---
+
+# R Strings
+
+## 1
+_Create a str variable with the value "Hello":_
+```{r strings_1, cache=TRUE}
+str <- "Hello"
+```
+Repeat of [R Variables > 1](#r-variables).
+
+## 2
+_Use the correct function to find the number of characters in the str variable:_
+```{r strings_2, cache=TRUE}
+str <- "Hello World!"
+nchar(str)
+```
+`nchar()`= `n`umber of `char`acters. Why does R use `nchar` when nearly every other language uses `length` or similar? That's R for you.
+
+## 3
+_Use the correct function to check if the character "H" is present in the str variable:_
+```{r strings_3, cache=TRUE}
+str <- "Hello World!"
+grepl("H", str)
+```
+Another one that feels very R-specific, though I do appreciate the unix `grep` heritage.
+
+## 4
+_Use a function to combine concatenate the two strings:_
+```{r strings_4, cache=TRUE}
+str1 <- "Hello"
+str2 <- "World!"
+paste(str1, str2)
+```
+Repeat of [R Variables > 3](#r-variables).
+
+---
+
+# R Booleans
+
+## 1
+_What is the output of the following code?_
+```{r booleans_1, cache=TRUE}
+10 < 9
+```
+FALSE, because 10 is not less than 9.
+
+## 2
+_Fill in the missing part to compare the two variables:_
+```{r booleans_2, cache=TRUE}
+a <- 10
+b <- 9
+a > b
+```
+10 is greater than 9 (at least for now).
+
+## 3
+_Fill in the missing part to print the value TRUE:_
+```{r booleans_3, cache=TRUE}
+a <- 10
+b <- 9
+
+a != b
+```
+There\'s `>`, `>=`, `!=`... a few options here.
+
+---
+
+# R Operators
+
+## 1
+_Multiply 10 with 5:_
+```{r operators_1, cache=TRUE}
+10 * 5
+```
+Simple multiplication operator, just like every other language.
+
+## 2
+_Divide 10 by 5:_
+```{r operators_2, cache=TRUE}
+10 / 5
+```
+Simple division operator, just like every other language.
+
+## 3
+_Use the "equal" operator to compare two values:_
+```{r operators_3, cache=TRUE}
+10 == 5
+```
+Double equals for equality check, standard in most languages.
+
+---
+
+# R If ... Else
+
+## 1
+_Print "Hello World" if `a` is greater than `b`._
+```{r ifelse_1, cache=TRUE}
+a <- 50
+b <- 10
+if (a > b) {
+  print("Hello World")
+}
+```
+Syntax is more like JavaScript or C here, with parentheses around the condition and curly braces for the block.
+
+## 2
+_Print "Hello World" if `a` is equal to `b`._
+```{r ifelse_2, cache=TRUE}
+a <- 50
+b <- 50
+if (a == b) {
+  print("Hello World")
+}
+```
+Same as above, just checking for equality.
+
+## 3
+_Print "Yes" if `a` is equal to `b`, otherwise print "No"._
+```{r ifelse_3, cache=TRUE}
+a <- 50
+b <- 50
+if (a == b) {
+  print("Yes")
+} else {
+  print("No")
+}
+```
+Again, pretty standard structure. 
+
+# R Loops
+
+## 1
+_Print `i` as long as `i` is less than 6._
+```{r loops_1, cache=TRUE}
+i <- 1
+while (i < 6) {
+  print(i)
+  i <- i + 1
+}
+```
+`For` question one, use `while`. Don't forget to increment `i` (or you'll be stuck forever...)!
+
+## 2
+_Use the correct keyword to exit the loop if `i` is equal to 4._
+```{r loops_2, cache=TRUE}
+i <- 1
+while (i < 6) {
+    print(i)
+    i <- i + 1
+    if (i == 4) {
+      break
+    }
+}
+```
+Are you ready to `break` out of this assignment grading loop, professor?
+
+## 3
+_Use the correct keyword to skip the value of 3 in a loop._
+```{r loops_3, cache=TRUE}
+i <- 0
+while (i < 6) {
+  i <- i + 1
+  if (i == 3) {
+    next
+  }
+  print(i)
+}
+```
+`next` is pretty unique syntax to R, like Python's `continue`.
+
+## 4
+_Use the correct keyword to iterate over a sequence of numbers._
+```{r loops_4, cache=TRUE}
+for (x in 1:10) {
+    print(x)
+}
+```
+`While` iterating over a finite sequence, use `for`.
+
+---
+
+# R Functions
+
+## 1
+_Insert the missing parts to create a function with the name `my_function`._
+```{r functions_1, cache=TRUE}
+my_function <- function() {
+  print("Hello World!")
+}
+```
+Storing functions as a variable, more like JavaScript than Python in syntax.
+
+## 2
+_Insert the missing part to __call__ `my_function`._
+```{r functions_2, cache=TRUE}
+my_function <- function() {
+  print("Hello World!")
+}
+my_function()
+```
+The parentheses function as an indicator of a `function()`.
+
+## 3
+_Add a `fname` argument to the function._
+```{r functions_3, cache=TRUE}
+my_function <- function(fname) {
+    paste(fname)
+}
+my_function("Peter")
+```
+Pass in those arguments! On-the-fly function-scoped variables.
+
+## 4
+_Insert the missing part to return a result (15)._ 
+```{r functions_4, cache=TRUE}
+my_function <- function(x) {
+    return(5 * x)
+}
+print(my_function(3))
+```
+`return()` is explicit in R, just like Python and JavaScript. I'm passing in the 3, and getting back the outpus specified in the `return` line.
+
+---
+
+# R Data Structures
+
+## 1
+_Insert the missing parts to create a vector of strings._ 
+```{r datastructures_1, cache=TRUE}
+fruits <- c("Banana", "Apple", "Orange")
+```
+It's time to `c`ombine some fruits into a vector!
+
+## 2
+_Insert the missing parts to find out how many items a vector has._ 
+```{r datastructures_2, cache=TRUE}
+fruits <- c("Banana", "Apple", "Orange")
+length(fruits)
+```
+And `length` shows up here, on a vector. Why can't I use `length` on a string, only `nchar`? What is a string, but a vector of characters? Thanks, R.
+
+## 3
+_Insert the missing parts to create a list of strings._ 
+```{r datastructures_3, cache=TRUE}
+thislist <- list("Banana", "Apple", "Cherry")
+```
+This doesn't really do a good job showcasing why you'd use a list over a vector... Throw an integer in there.
+
+## 4
+_Insert the missing parts to create a matrix of strings._
+```{r datastructures_4, cache=TRUE}
+thismatrix <- matrix(c("Banana", "Apple", "Cherry", "Orange"), nrow=2, ncol=2)
+```
+Now that's a fruity spreadsheet.
+
+## 5
+_Insert the missing parts to create an array with two dimensions._
+```{r datastructures_5, cache=TRUE}
+thisarray <- c(1:24)
+multiarray <- array(thisarray, dim = c(4,3,2))
+```
+Arrays remind me of working in MongoDB, just layers upon layers upon layers. Arrays of arrays of arrays. Something that bugs me with R is how much overlap there is between data structures. All of this could really be trimmed down like what we see in, say, JavaScript: arrays and objects. All of these R structure types are basically those two things, but it seems like they are trying to account for special rules, like limiting the contents to one data type. I get that R is specialized, but even so, some of these distinctions feel entirely unnecessary. Perhaps I'll feel differently as we go along.
+
+## 6
+_Insert the missing part to create a data frame._ 
+```{r datastructures_6, cache=TRUE}
+Data_Frame <<- data.frame(
+    Training = c("Strength", "Stamina", "Other"),
+    Pulse = c(100, 150, 120),
+    Duration = c(60, 30, 45)
+)
+```
+I'm changing this to be global so I can use it later in some plotting exercises.
+
+## 7
+_Insert the missing part to create a factor._ 
+```{r datastructures_7, cache=TRUE}
+music_genre <- factor(c("Jazz", "Rock", "Classic", "Classic", "Pop", "Jazz", "Rock", "Jazz"))
+```
+Factors, like buckets. For bucketing!
+
+---
+
+# R Graphics
+
+## Plot
+```{r graphics_plot, cache=TRUE, dependson="datastructures_6"}
+plot(Data_Frame$Duration, Data_Frame$Pulse, type = "p", col = "blue", main = "Training Data", xlab = "Duration (minutes)", ylab = "Pulse (BPM)")
+```
+I thought I might as well use the `Data_Frame` from earlier and just create something new. I'm ignoring the "Training" categories, instead assuming that this is measuring pulse over the course of a single workout. What I get is a neat story of what I'm guessing is someone relaxing after a workout (however, 60 minutes and their bpm is STILL at 100? You may want to see a doctor.)
+
+## Line
+```{r graphics_line, cache=TRUE, dependson="datastructures_6"}
+Data_Frame <- Data_Frame[order(Data_Frame$Duration), ]
+plot(Data_Frame$Duration, Data_Frame$Pulse, type = "l", col = "blue", main = "Training Data", xlab = "Duration (minutes)", ylab = "Pulse (BPM)")
+```
+I had to reorder the data by Duration from low to high to get a proper line graph.
+
+## Scatterplot
+```{r graphics_scatterplot, cache=TRUE, dependson="datastructures_6"}
+# day one, the age and speed of 12 cars:
+x1 <- c(5,7,8,7,2,2,9,4,11,12,9,6)
+y1 <- c(99,86,87,88,111,103,87,94,78,77,85,86)
+
+# day two, the age and speed of 15 cars:
+x2 <- c(2,2,8,1,15,8,12,9,7,3,11,4,7,14,12)
+y2 <- c(100,105,84,105,90,99,90,95,94,100,79,112,91,80,85)
+
+plot(x1, y1, main="Observation of Cars", xlab="Car age", ylab="Car speed", col = "green")
+points(x2, y2, col = "red")
+legend("topright", 
+    legend = c("Day 1", "Day 2", "Trend"),
+    col = c("green", "red", "blue"),
+    lty = c(1,1,1),
+    lwd = c(2,2,2)
+)
+# Trend line for car speed over time
+model <- lm(c(y1, y2) ~ c(x1, x2))
+abline(model, col = "blue", lwd = 2)
+```
+The example from the site, but with a legend now! And added a linear model trend line.
+
+## Pie Charts
+```{r graphics_pie, cache=TRUE, dependson="datastructures_6"}
+pie(Data_Frame$Duration, label = Data_Frame$Training, main = "Training Duration Distribution")
+```
+Back to the training data. This was really easy, just the number value as x and label in the y position.
+
+## Bars
+```{r graphics_bars, cache=TRUE, dependson="datastructures_6"}
+barplot(Data_Frame$Duration, names.arg = Data_Frame$Training, main = "Training Duration Distribution", density = 30)
+```
+Same as pie chart, really. Pretty easy to swap.
+
+---
+
+# R Statistics
+I've got no datasets on hand, but I'd like to try my hand at making some. Looks like I can use `roxygen2` to generate Rd files, but making them by hand doesn't look too bad. I appreciate that R packages require all exported functions and datasets to have complete documentation.
+
+I also like their use of `which()` in the examples, reminds me of oldschool `HLOOKUP`/`VLOOKUP` in Excel and fetching values before `XLOOKUP` became a thing. `rownames(Data_Cars)[which.max(Data_Cars$hp)]` is fairly elegant.
+
+Cool that quartiles are the default on `quantile()`, quite easy.
