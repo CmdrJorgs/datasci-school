@@ -1,7 +1,7 @@
 ---
 title: "Exercise 1"
 author: "David Jorgensen"
-date: "2024-06-15"
+date: "2025-12-06"
 output: html_document
 ---
 
@@ -629,7 +629,14 @@ while (dice <= 6) {
 #### Horizontal Bars
 
 # R Statistics
-## R Data Set 
+## R Data Set
+```{r cars, cache=TRUE, echo=FALSE}
+mtcars <- data.frame (
+  Training = c("Strength", "Stamina", "Other"),
+  Pulse = c(100, 150, 120),
+  Duration = c(60, 30, 45)
+)
+```
 #### Data Set
 #### Information About the Data Set
 #### Get Information 
