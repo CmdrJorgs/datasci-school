@@ -1,0 +1,3 @@
+[submodule "520/textbook"]
+	path = 520/textbook
+	url = git@github.com:stefmolin/Hands-On-Data-Analysis-with-Pandas-2nd-edition.git
