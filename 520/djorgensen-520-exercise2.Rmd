@@ -1,0 +1,78 @@
+---
+title: "Exercise 2"
+author: "David Jorgensen"
+date: "2025-12-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Data Prep
+```{r prep}
+# load CSV into data frame `ledger`
+ledger <- read.csv("sales_data_sample.csv")
+# set ledger$OrderDate to Date class
+ledger$OrderDate <- as.Date(ledger$OrderDate, format="%Y-%m-%d")
+# create new column Month extracting month from OrderDate
+ledger$Month <- as.numeric(format(ledger$OrderDate, "%m"))
+# check the structure of the data
+str(ledger)
+# check the class of the data
+class(ledger)
+
+# assign ledger to sales_data in global environment
+sales_data <<- ledger
+```
+
+# Charts
+
+## Bar
+```{r bar}
+# Bar graph showing product and the sum of sales for each.
+sales_by_product <- aggregate(sales_data$TotalSales, by=list(product=sales_data$Product), FUN=sum)
+colnames(sales_by_product) <- c("product", "sales")
+barplot(sales_by_product$sales, names.arg=sales_by_product$product,
+main="Sales by Product", xlab="Product", ylab="Total Sales")
+```
+
+## Pie
+```{r pie}
+# Pie chart showing sum of sales by region
+sales_by_region <- aggregate(sales_data$TotalSales, by=list(region=sales_data$Region), FUN=sum)
+colnames(sales_by_region) <- c("region", "sales")
+pie(sales_by_region$sales, labels=sales_by_region$region,
+main="Sales by Region")
+```
+
+## Box Plot
+```{r boxplot}
+# Box plots for average sales by region and average quantities by region.
+boxplot(TotalSales ~ Region, data=sales_data,
+main="Total Sales by Region", xlab="Region", ylab="Total Sales")
+boxplot(Quantity ~ Region, data=sales_data,
+main="Quantity by Region", xlab="Region", ylab="Quantity")
+```
+
+## Histogram
+```{r histogram}
+# Histogram of the count of orders by product.
+hist(sales_data$TotalSales, breaks=10,
+main="Histogram of Total Sales", xlab="Total Sales", ylab="Frequency")
+```
+
+## Radial Plot
+```{r radial}
+# A radial plot showing total sales (for all products) by month.
+library(ggplot2)
+
+
+sales_by_month <- aggregate(sales_data$TotalSales, by=list(month=sales_data$Month), FUN=sum)
+colnames(sales_by_month) <- c("month", "sales")
+ggplot(sales_by_month, aes(x=month, y=sales)) +
+  geom_bar(stat="identity") +
+  coord_polar(start=0) +
+  labs(title="Total Sales by Month", x="Month", y="Total Sales")
+
+```
