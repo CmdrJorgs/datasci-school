@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # load CSV into data frame `ledger`
 ledger <- read.csv("sales_data_sample.csv")
 # set ledger$OrderDate to Date class
-ledger$OrderDate <- as.Date(ledger$OrderDate, format="%Y-%m-%d")
+ledger$OrderDate <- as.Date(ledger$OrderDate, format="%m/%d/%Y")
 # create new column Month extracting month from OrderDate
 ledger$Month <- as.numeric(format(ledger$OrderDate, "%m"))
 # check the structure of the data
@@ -58,8 +58,10 @@ main="Quantity by Region", xlab="Region", ylab="Quantity")
 ## Histogram
 ```{r histogram}
 # Histogram of the count of orders by product.
-hist(sales_data$TotalSales, breaks=10,
-main="Histogram of Total Sales", xlab="Total Sales", ylab="Frequency")
+sales_by_product <- aggregate(sales_data$Quantity, by=list(product=sales_data$Product), FUN=sum)
+colnames(sales_by_product) <- c("product", "count")
+ggplot(sales_by_product, aes(x = product, y = count)) +
+    labs(title="Count of Orders by Product", xlab="Quantity", ylab="Count of Orders")
 ```
 
 ## Radial Plot
@@ -70,9 +72,11 @@ library(ggplot2)
 
 sales_by_month <- aggregate(sales_data$TotalSales, by=list(month=sales_data$Month), FUN=sum)
 colnames(sales_by_month) <- c("month", "sales")
-ggplot(sales_by_month, aes(x=month, y=sales)) +
-  geom_bar(stat="identity") +
-  coord_polar(start=0) +
-  labs(title="Total Sales by Month", x="Month", y="Total Sales")
+sales_by_month$quarter <- ceiling(sales_by_month$month / 3)
+ggplot(sales_by_month, aes(x=month, y=sales, fill=as.factor(quarter))) +
+    geom_bar(stat="identity") +
+    coord_polar(start=0) +
+    labs(title="Total Sales by Month", x="Month", y="Total Sales") +
+    scale_fill_manual(values=c("1"="lightblue", "2"="lightgreen", "3"="lightyellow", "4"="lightcoral"), name="Quarter")
 
 ```
