@@ -1,0 +1,266 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Exercise 2},
+  pdfauthor={David Jorgensen},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\title{Exercise 2}
+\author{David Jorgensen}
+\date{2025-12-14}
+
+\begin{document}
+\maketitle
+
+\hypertarget{data-prep}{%
+\section{Data Prep}\label{data-prep}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# load CSV into data frame \textasciigrave{}ledger\textasciigrave{}}
+\NormalTok{ledger }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(}\StringTok{"sales\_data\_sample.csv"}\NormalTok{)}
+\CommentTok{\# set ledger$OrderDate to Date class}
+\NormalTok{ledger}\SpecialCharTok{$}\NormalTok{OrderDate }\OtherTok{\textless{}{-}} \FunctionTok{as.Date}\NormalTok{(ledger}\SpecialCharTok{$}\NormalTok{OrderDate, }\AttributeTok{format=}\StringTok{"\%m/\%d/\%Y"}\NormalTok{)}
+\CommentTok{\# create new column Month extracting month from OrderDate}
+\NormalTok{ledger}\SpecialCharTok{$}\NormalTok{Month }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{format}\NormalTok{(ledger}\SpecialCharTok{$}\NormalTok{OrderDate, }\StringTok{"\%m"}\NormalTok{))}
+\CommentTok{\# check the structure of the data}
+\FunctionTok{str}\NormalTok{(ledger)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 'data.frame':    495 obs. of  8 variables:
+##  $ OrderID   : int  1 2 3 4 5 6 7 8 9 10 ...
+##  $ OrderDate : Date, format: "2024-01-12" "2025-08-27" ...
+##  $ Region    : chr  "South" "South" "North" "West" ...
+##  $ Product   : chr  "Product_D" "Product_A" "Product_A" "Product_A" ...
+##  $ Quantity  : int  7 15 11 8 7 19 11 11 4 8 ...
+##  $ UnitPrice : num  34.37 8.59 2 3.09 24.05 ...
+##  $ TotalSales: num  60.1 30.1 34 23.4 707.2 ...
+##  $ Month     : num  1 8 5 4 9 10 8 4 4 5 ...
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# check the class of the data}
+\FunctionTok{class}\NormalTok{(ledger)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "data.frame"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# assign ledger to sales\_data in global environment}
+\NormalTok{sales\_data }\OtherTok{\textless{}\textless{}{-}}\NormalTok{ ledger}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{charts}{%
+\section{Charts}\label{charts}}
+
+\hypertarget{bar}{%
+\subsection{Bar}\label{bar}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Bar graph showing product and the sum of sales for each product}
+\CommentTok{\# aggregate sales by product}
+\NormalTok{sales\_by\_product }\OtherTok{\textless{}{-}} \FunctionTok{aggregate}\NormalTok{(sales\_data}\SpecialCharTok{$}\NormalTok{TotalSales, }\AttributeTok{by=}\FunctionTok{list}\NormalTok{(}\AttributeTok{product=}\NormalTok{sales\_data}\SpecialCharTok{$}\NormalTok{Product), }\AttributeTok{FUN=}\NormalTok{sum)}
+\CommentTok{\# set column names}
+\FunctionTok{colnames}\NormalTok{(sales\_by\_product) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"product"}\NormalTok{, }\StringTok{"sales"}\NormalTok{)}
+\CommentTok{\# create barplot}
+\FunctionTok{barplot}\NormalTok{(sales\_by\_product}\SpecialCharTok{$}\NormalTok{sales, }\AttributeTok{names.arg=}\NormalTok{sales\_by\_product}\SpecialCharTok{$}\NormalTok{product,}
+\AttributeTok{main=}\StringTok{"Sales by Product"}\NormalTok{, }\AttributeTok{xlab=}\StringTok{"Product"}\NormalTok{, }\AttributeTok{ylab=}\StringTok{"Total Sales"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{djorgensen-520-exercise2_files/figure-latex/bar-1.pdf}
+
+\hypertarget{pie}{%
+\subsection{Pie}\label{pie}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Pie chart showing sum of sales by region}
+\NormalTok{sales\_by\_region }\OtherTok{\textless{}{-}} \FunctionTok{aggregate}\NormalTok{(sales\_data}\SpecialCharTok{$}\NormalTok{TotalSales, }\AttributeTok{by=}\FunctionTok{list}\NormalTok{(}\AttributeTok{region=}\NormalTok{sales\_data}\SpecialCharTok{$}\NormalTok{Region), }\AttributeTok{FUN=}\NormalTok{sum)}
+\CommentTok{\# set column names}
+\FunctionTok{colnames}\NormalTok{(sales\_by\_region) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"region"}\NormalTok{, }\StringTok{"sales"}\NormalTok{)}
+\CommentTok{\# create pie chart}
+\FunctionTok{pie}\NormalTok{(sales\_by\_region}\SpecialCharTok{$}\NormalTok{sales, }\AttributeTok{labels=}\NormalTok{sales\_by\_region}\SpecialCharTok{$}\NormalTok{region,}
+\AttributeTok{main=}\StringTok{"Sales by Region"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{djorgensen-520-exercise2_files/figure-latex/pie-1.pdf}
+
+\hypertarget{box-plot}{%
+\subsection{Box Plot}\label{box-plot}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Box plots for average sales by region and average quantities by region}
+\CommentTok{\# boxplot of TotalSales by Region}
+\FunctionTok{boxplot}\NormalTok{(TotalSales }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Region, }\AttributeTok{data=}\NormalTok{sales\_data,}
+\AttributeTok{main=}\StringTok{"Total Sales by Region"}\NormalTok{, }\AttributeTok{xlab=}\StringTok{"Region"}\NormalTok{, }\AttributeTok{ylab=}\StringTok{"Total Sales"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{djorgensen-520-exercise2_files/figure-latex/boxplot-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# boxplot of Quantity by Region}
+\FunctionTok{boxplot}\NormalTok{(Quantity }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Region, }\AttributeTok{data=}\NormalTok{sales\_data,}
+\AttributeTok{main=}\StringTok{"Quantity by Region"}\NormalTok{, }\AttributeTok{xlab=}\StringTok{"Region"}\NormalTok{, }\AttributeTok{ylab=}\StringTok{"Quantity"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{djorgensen-520-exercise2_files/figure-latex/boxplot-2.pdf}
+
+\hypertarget{histogram}{%
+\subsection{Histogram}\label{histogram}}
+
+Because this data is categorical, a histogram is not appropriate.
+Instead, we can create a bar plot to show the count of orders by
+product.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Barplot of the count of orders by product.}
+\CommentTok{\# create table of counts by product}
+\NormalTok{orders\_by\_product }\OtherTok{\textless{}{-}} \FunctionTok{table}\NormalTok{(sales\_data}\SpecialCharTok{$}\NormalTok{Product)}
+\CommentTok{\# create barplot}
+\FunctionTok{barplot}\NormalTok{(orders\_by\_product,}
+\AttributeTok{main=}\StringTok{"Count of Orders by Product"}\NormalTok{, }\AttributeTok{xlab=}\StringTok{"Product"}\NormalTok{, }\AttributeTok{ylab=}\StringTok{"Number of Orders"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{djorgensen-520-exercise2_files/figure-latex/histogram-1.pdf}
+
+\hypertarget{radial-plot}{%
+\subsection{Radial Plot}\label{radial-plot}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# A radial plot showing total sales (for all products) by month.}
+\FunctionTok{library}\NormalTok{(ggplot2)}
+
+\CommentTok{\# Aggregate total sales by month}
+\NormalTok{sales\_by\_month }\OtherTok{\textless{}{-}} \FunctionTok{aggregate}\NormalTok{(sales\_data}\SpecialCharTok{$}\NormalTok{TotalSales, }\AttributeTok{by=}\FunctionTok{list}\NormalTok{(}\AttributeTok{month=}\NormalTok{sales\_data}\SpecialCharTok{$}\NormalTok{Month), }\AttributeTok{FUN=}\NormalTok{sum)}
+\CommentTok{\# set column names}
+\FunctionTok{colnames}\NormalTok{(sales\_by\_month) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"month"}\NormalTok{, }\StringTok{"sales"}\NormalTok{)}
+\CommentTok{\# Create quarter column}
+\NormalTok{sales\_by\_month}\SpecialCharTok{$}\NormalTok{quarter }\OtherTok{\textless{}{-}} \FunctionTok{ceiling}\NormalTok{(sales\_by\_month}\SpecialCharTok{$}\NormalTok{month }\SpecialCharTok{/} \DecValTok{3}\NormalTok{)}
+\CommentTok{\# Create radial plot}
+\FunctionTok{ggplot}\NormalTok{(sales\_by\_month, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{month, }\AttributeTok{y=}\NormalTok{sales, }\AttributeTok{fill=}\FunctionTok{as.factor}\NormalTok{(quarter))) }\SpecialCharTok{+}
+    \FunctionTok{geom\_bar}\NormalTok{(}\AttributeTok{stat=}\StringTok{"identity"}\NormalTok{) }\SpecialCharTok{+} \CommentTok{\# use geom\_bar for radial plot}
+    \FunctionTok{coord\_polar}\NormalTok{(}\AttributeTok{start=}\DecValTok{0}\NormalTok{) }\SpecialCharTok{+} \CommentTok{\# convert to polar coordinates}
+    \FunctionTok{labs}\NormalTok{(}\AttributeTok{title=}\StringTok{"Total Sales by Month"}\NormalTok{, }\AttributeTok{x=}\StringTok{"Month"}\NormalTok{, }\AttributeTok{y=}\StringTok{"Total Sales"}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{scale\_fill\_manual}\NormalTok{(}\AttributeTok{values=}\FunctionTok{c}\NormalTok{(}\StringTok{"1"}\OtherTok{=}\StringTok{"lightblue"}\NormalTok{, }\StringTok{"2"}\OtherTok{=}\StringTok{"lightgreen"}\NormalTok{, }\StringTok{"3"}\OtherTok{=}\StringTok{"lightyellow"}\NormalTok{, }\StringTok{"4"}\OtherTok{=}\StringTok{"lightcoral"}\NormalTok{), }\AttributeTok{name=}\StringTok{"Quarter"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{djorgensen-520-exercise2_files/figure-latex/radial-1.pdf}
+
+\end{document}
