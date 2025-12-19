@@ -1,0 +1,101 @@
+---
+title: "Exercise 2"
+author: "David Jorgensen"
+date: "2025-12-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Data Prep
+```{r prep}
+# load CSV into data frame `ledger`
+ledger <- read.csv("sales_data_sample.csv")
+# set ledger$OrderDate to Date class
+ledger$OrderDate <- as.Date(ledger$OrderDate, format="%m/%d/%Y")
+# create new column Month extracting month from OrderDate
+ledger$Month <- as.numeric(format(ledger$OrderDate, "%m"))
+# check the structure of the data
+str(ledger)
+# check the class of the data
+class(ledger)
+
+# assign ledger to sales_data in global environment
+sales_data <<- ledger
+```
+
+# Charts
+
+## Bar
+```{r bar}
+# Bar graph showing product and the sum of sales for each product
+# aggregate sales by product
+sales_by_product <- aggregate(sales_data$TotalSales, by=list(product=sales_data$Product), FUN=sum)
+# set column names
+colnames(sales_by_product) <- c("product", "sales")
+# create barplot
+barplot(sales_by_product$sales, names.arg=sales_by_product$product,
+main="Sales by Product", xlab="Product", ylab="Total Sales")
+```
+
+## Pie
+```{r pie}
+# Pie chart showing sum of sales by region
+sales_by_region <- aggregate(sales_data$TotalSales, by=list(region=sales_data$Region), FUN=sum)
+# set column names
+colnames(sales_by_region) <- c("region", "sales")
+# create pie chart
+pie(sales_by_region$sales, labels=sales_by_region$region,
+main="Sales by Region")
+```
+
+## Box Plot
+```{r boxplot}
+# Box plots for average sales by region and average quantities by region
+# boxplot of TotalSales by Region
+boxplot(TotalSales ~ Region, data=sales_data,
+main="Total Sales by Region", xlab="Region", ylab="Total Sales")
+# boxplot of Quantity by Region
+boxplot(Quantity ~ Region, data=sales_data,
+main="Quantity by Region", xlab="Region", ylab="Quantity")
+```
+
+## Histogram
+Because this data is categorical, a histogram is not appropriate. Instead, we can create a bar plot to show the count of orders by product. Furthermore, due to vagueness of the meaning of "count of orders", we will create two bar plots: one showing the count of orders by product, and another showing the total quantity sold by product.
+```{r histogram}
+# Barplot of the count of orders by product.
+# create table of counts by product
+orders_by_product <- table(sales_data$Product)
+# create barplot
+barplot(orders_by_product,
+main="Count of Orders by Product", xlab="Product", ylab="Number of Orders")
+# create table of quantity by product
+quantity_by_product <- aggregate(sales_data$Quantity, by=list(product=sales_data$Product), FUN=sum)
+# set column names
+colnames(quantity_by_product) <- c("product", "quantity")
+# create barplot of quantity by product
+barplot(quantity_by_product$quantity, names.arg=quantity_by_product$product,
+main="Total Quantity Sold by Product", xlab="Product", ylab="Total Quantity")
+```
+
+## Radial Plot
+```{r radial}
+# A radial plot showing total sales (for all products) by month.
+library(ggplot2)
+
+# Aggregate total sales by month
+sales_by_month <- aggregate(sales_data$TotalSales, by=list(month=sales_data$Month), FUN=sum)
+# set column names
+colnames(sales_by_month) <- c("month", "sales")
+# Create quarter column
+sales_by_month$quarter <- ceiling(sales_by_month$month / 3)
+# Create radial plot
+ggplot(sales_by_month, aes(x=month, y=sales, fill=as.factor(quarter))) +
+    geom_bar(stat="identity") + # use geom_bar for radial plot
+    coord_polar(start=0) + # convert to polar coordinates
+    labs(title="Total Sales by Month", x="Month", y="Total Sales") +
+    scale_fill_manual(values=c("1"="lightblue", "2"="lightgreen", "3"="lightyellow", "4"="lightcoral"), name="Quarter")
+
+```
