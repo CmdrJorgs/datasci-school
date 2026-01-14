@@ -1,0 +1,269 @@
+---
+title: "Exercise 3"
+author: "David Jorgensen"
+date: "2025-12-21"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Data Prep
+
+```{r prep}
+# load CSV into data frame `ledger`
+# ledger <- read.csv("/home/djorgs/Documents/school/datasci-school/520/sales_data_sample.csv")
+ledger <- read.csv(file.choose(), header=TRUE)
+# set ledger$OrderDate to Date class
+ledger$OrderDate <- as.Date(ledger$OrderDate, format="%m/%d/%Y")
+# create new column Month extracting month from OrderDate
+ledger$Month <- as.numeric(format(ledger$OrderDate, "%m"))
+# check the structure of the data
+str(ledger)
+# check the class of the data
+class(ledger)
+
+# assign ledger to sales_data in global environment
+sales_data <<- ledger
+```
+
+# Assignment
+
+For each numeric attribute in the sales_data dataset:
+
+- Show the distributions of values visually. Explain, in comments, what those distributions mean statistically. Be thorough.
+- Show the values of central tendency, both numerically and visually. Interpret those values in your own words in Markdown.
+- Show the measures of dispersion, visually and numerically (where appropriate). Interpret those values in Markdown.
+- Visually depict the Interquartile range. Interpret the IQR for the dataset (in Markdown).
+- Create the statistics moments for the dataset.
+
+Experiment with histogram binning for the categorical data in R. This is open-ended intentionally because this dataset isn't ideal for binning, but I want you to build something using binning just to see how it works.
+
+# Analysis
+
+## Show distributions of values visually. Explain, in comments, what those distributions mean statistically. Be thorough.
+
+```{r q1}
+# Create distribution visualizations on Quantity, TotalSales and UnitPrice.
+
+# Histogram for TotalSales
+hist(sales_data$TotalSales, main="Distribution of Sales", xlab="Sales", ylab="Frequency", col="lightblue")
+# This is a Power-law distribution, where total sale profits are inversely proportional to the frequency of high-value sales. This means that the smaller sales are more frequent.
+
+# Boxplot for TotalSales
+boxplot(sales_data$TotalSales, main="Boxplot of Sales", xlab="Sales", ylab="Value", col="lightgreen")
+# The data is right-skewed, meaning there are more high-value outliers than low ones. The median is closer to the bottom of the box, reinforcing the skew. The presence of outliers indicates variability in sales, possibly due to large one-off purchases or high-priced products.
+
+# Density plot for TotalSales
+plot(density(sales_data$TotalSales), main="Density Plot of Sales", xlab="Sales", ylab="Density", col="lightpink")
+# The density plot shows a similar pattern to the histogram, with a long tail on the right side, indicating a right-skewed distribution. The peak of the density curve is at a lower value, suggesting that the majority of sales are smaller in amount.
+
+# Histogram for QuantityOrdered
+hist(sales_data$Quantity, main="Distribution of Quantity Ordered", xlab="Quantity Ordered", ylab="Frequency", col="lightblue")
+# This looks like a more uniform distribution, with a very slight right skew. Smaller quantities per order are more common, but there are also plenty of instances where larger quantities are being ordered.
+
+# Boxplot for Quantity
+boxplot(sales_data$Quantity, main="Boxplot of Quantity Ordered", xlab="Quantity Ordered", ylab="Value", col="lightgreen")
+# The data is right-skewed, with a median that is closer to the lower end of the box. The IQR range is between 4 and 15 quantity per order.
+
+# Density plot for Quantity
+plot(density(sales_data$Quantity), main="Density Plot of Quantity Ordered", xlab="Quantity Ordered", ylab="Density", col="lightpink")
+# This is a bimodal density plot, with the range in between the two peaks still quite large. Still, it is slightly positively skewed, with a higher frequency of lower prices than higher ones. Quantities above 20 are unlikely.
+
+# Histogram for UnitPrice
+hist(sales_data$UnitPrice, main="Distribution of Price Each", xlab="Price Each", ylab="Frequency", col="lightblue")
+# This is uniform until the $100/item mark. This indicates that most products purchased are priced below $100, with a few exceptions that are significantly more expensive.
+
+# Boxplot for UnitPrice
+boxplot(sales_data$UnitPrice, main="Boxplot of Price Each", xlab="Price Each", ylab="Value", col="lightgreen")
+# Median price is roughly $50/item, with an IQR range of approximately $25-$80/item. The most extreme outliers are just above $0 or about $150.
+
+# Density plot for UnitPrice
+plot(density(sales_data$UnitPrice), main="Density Plot of Price Each", xlab="Price Each", ylab="Density", col="lightpink")
+# The density plot shows a bimodal distribution, with a peak around $25 and another around $75. The most popular products are probably at these price points.
+```
+
+## Show the values of central tendency, both numerically and visually.
+
+```{r q2}
+# Mean, Median, and Mode for TotalSales
+mean_sales <- mean(sales_data$TotalSales)
+median_sales <- median(sales_data$TotalSales)
+mode_sales <- names(which.max(table(sales_data$TotalSales)))
+# Mean, Median, and Mode for QuantityOrdered
+mean_quantity <- mean(sales_data$Quantity)
+median_quantity <- median(sales_data$Quantity)
+mode_quantity <- names(which.max(table(sales_data$Quantity)))
+# Mean, Median, and Mode for UnitPrice
+mean_price <- mean(sales_data$UnitPrice)
+median_price <- median(sales_data$UnitPrice)
+mode_price <- names(which.max(table(sales_data$UnitPrice)))
+
+# Print central tendency values
+cat("Central Tendency for TotalSales:\n", "Mean:", mean_sales, "\n", "Median:", median_sales, "\n", "Mode:", mode_sales, "\n")
+cat("Central Tendency for QuantityOrdered:\n", "Mean:", mean_quantity, "\n", "Median:", median_quantity, "\n", "Mode:", mode_quantity, "\n")
+cat("Central Tendency for UnitPrice:\n", "Mean:", mean_price, "\n", "Median:", median_price, "\n", "Mode:", mode_price, "\n")
+
+# Visualize central tendency for TotalSales
+hist(sales_data$TotalSales, main="Distribution of Sales with Central Tendency", xlab="Sales", ylab="Frequency", col="lightblue")
+abline(v=mean_sales, col="red", lwd=2)
+abline(v=median_sales, col="blue", lwd=2)
+abline(v=as.numeric(mode_sales), col="green", lwd=2)
+# Visualize central tendency for QuantityOrdered
+hist(sales_data$Quantity, main="Distribution of Quantity Ordered with Central Tendency", xlab="Quantity Ordered", ylab="Frequency", col="lightblue")
+abline(v=mean_quantity, col="red", lwd=2)
+abline(v=median_quantity, col="blue", lwd=2)
+abline(v=as.numeric(mode_quantity), col="green", lwd=2)	
+# Visualize central tendency for UnitPrice
+hist(sales_data$UnitPrice, main="Distribution of Price Each with Central Tendency", xlab="Price Each", ylab="Frequency", col="lightblue")
+abline(v=mean_price, col="red", lwd=2)	
+abline(v=median_price, col="blue", lwd=2)
+abline(v=as.numeric(mode_price), col="green", lwd=2)
+```
+
+## Show the measures of dispersion, visually and numerically (where appropriate). Interpret those values in Markdown.
+
+### TotalSales
+
+```{r q3_1}
+# Standard Deviation and Variance for TotalSales
+std_dev_sales <- sd(sales_data$TotalSales)
+variance_sales <- var(sales_data$TotalSales)
+# Visualize dispersion for TotalSales
+hist(sales_data$TotalSales, main="Distribution of Sales with Dispersion", xlab="Sales", ylab="Frequency", col="lightblue")
+abline(v=mean_sales, col="red", lwd=2)
+abline(v=mean_sales + std_dev_sales, col="red", lwd=2)
+abline(v=mean_sales - std_dev_sales, col="red", lwd=2)
+abline(v=mean_sales + 2*std_dev_sales, col="red", lwd=2)
+abline(v=mean_sales - 2*std_dev_sales, col="red", lwd=2)
+abline(v=mean_sales + 3*std_dev_sales, col="red", lwd=2)
+abline(v=mean_sales - 3*std_dev_sales, col="red", lwd=2)
+```
+
+Most transactions cluster at lower profit values. Frequency drops sharply as sales increase, indicating fewer high-profit transactions. This skew suggests that while high-value sales exist, they are rare. The mean is pulled rightward by high-value outliers. The standard deviation lines show a wide spread, indicating profits vary significantly across transactions.
+
+### QuantityOrdered
+
+```{r q3_2}
+# Standard Deviation and Variance for QuantityOrdered
+std_dev_quantity <- sd(sales_data$Quantity)
+variance_quantity <- var(sales_data$Quantity)
+# Visualize dispersion for QuantityOrdered
+hist(sales_data$Quantity, main="Distribution of Quantity Ordered with Dispersion", xlab="Quantity Ordered", ylab="Frequency", col="lightblue")
+abline(v=mean_quantity, col="red", lwd=2)
+abline(v=mean_quantity + std_dev_quantity, col="red", lwd=2)
+abline(v=mean_quantity - std_dev_quantity, col="red", lwd=2)
+abline(v=mean_quantity + 2*std_dev_quantity, col="red", lwd=2)
+abline(v=mean_quantity - 2*std_dev_quantity, col="red", lwd=2)
+abline(v=mean_quantity + 3*std_dev_quantity, col="red", lwd=2)
+abline(v=mean_quantity - 3*std_dev_quantity, col="red", lwd=2)
+```
+
+The histogram has a slight right skew, with the mean just below 10. While the quantity is more uniform, we can observe that it is slightly more likely for quantities in purchases to be one standard deviation above or below the mean. Further standard deviations are not visible in the data, indicating that most quantities ordered are fairly close to the mean with few extreme outliers (indeed, no orders seem to exceed 20 in quantity).
+
+### UnitPrice
+
+```{r q3_3}
+# Standard Deviation and Variance for UnitPrice
+std_dev_price <- sd(sales_data$UnitPrice)
+variance_price <- var(sales_data$UnitPrice)
+# Visualize dispersion for UnitPrice
+hist(sales_data$UnitPrice, main="Distribution of Price Each with Dispersion", xlab="Price Each", ylab="Frequency", col="lightblue")
+abline(v=mean_price, col="red", lwd=2)
+abline(v=mean_price + std_dev_price, col="red", lwd=2)
+abline(v=mean_price - std_dev_price, col="red", lwd=2)
+abline(v=mean_price + 2*std_dev_price, col="red", lwd=2)
+abline(v=mean_price - 2*std_dev_price, col="red", lwd=2)
+abline(v=mean_price + 3*std_dev_price, col="red", lwd=2)
+abline(v=mean_price - 3*std_dev_price, col="red", lwd=2)
+```
+
+There is a wide spread of prices, with the mean far above the median indicating a right skew. Prices are usually nearly 3 standard deviations below the mean, but very few prices are more than one standard deviation above the mean.
+
+## Visually depict the Interquartile range. Interpret the IQR for the dataset (in Markdown).
+
+### TotalSales
+
+```{r q4_1}
+# IQR for TotalSales
+iqr_sales <- IQR(sales_data$TotalSales)
+# Visualize IQR for TotalSales
+hist(sales_data$TotalSales, main="Distribution of Sales with IQR", xlab="Sales", ylab="Frequency", col="lightblue")
+abline(v=quantile(sales_data$TotalSales, 0.25), col="red", lwd=2)
+abline(v=quantile(sales_data$TotalSales, 0.75), col="red", lwd=2)
+abline(v=quantile(sales_data$TotalSales, 0.25) + iqr_sales, col="red", lwd=2)
+abline(v=quantile(sales_data$TotalSales, 0.25) - iqr_sales, col="red", lwd=2)	
+```
+
+The IQR for TotalSales is narrow and concentrated towards the lower end of the sales profits distribution. This indicates that the middle 75% of sales profits are at or below about $600/order, with 25% of those sales below about $50/order.
+
+### QuantityOrdered
+
+```{r q4_2}
+# IQR for QuantityOrdered
+iqr_quantity <- IQR(sales_data$Quantity)
+# Visualize IQR for QuantityOrdered	
+hist(sales_data$Quantity, main="Distribution of Quantity Ordered with IQR", xlab="Quantity Ordered", ylab="Frequency", col="lightblue")
+abline(v=quantile(sales_data$Quantity, 0.25), col="red", lwd=2)
+abline(v=quantile(sales_data$Quantity, 0.75), col="red", lwd=2)
+abline(v=quantile(sales_data$Quantity, 0.25) + iqr_quantity, col="red", lwd=2)
+abline(v=quantile(sales_data$Quantity, 0.25) - iqr_quantity, col="red", lwd=2)
+```
+
+The IQR has a wide spread, indicating that the middle 50% of sales profits are spread out over a large range. The IQR is about the same as the standard deviation, indicating a high level of variability in the middle 50% of sales profits.
+
+### UnitPrice
+
+```{r q4_3}
+# IQR for UnitPrice
+iqr_price <- IQR(sales_data$UnitPrice)
+# Visualize IQR for UnitPrice
+hist(sales_data$UnitPrice, main="Distribution of Price Each with IQR", xlab="Price Each", ylab="Frequency", col="lightblue")
+abline(v=quantile(sales_data$UnitPrice, 0.25), col="red", lwd=2)
+abline(v=quantile(sales_data$UnitPrice, 0.75), col="red", lwd=2)
+abline(v=quantile(sales_data$UnitPrice, 0.25) + iqr_price, col="red", lwd=2)
+abline(v=quantile(sales_data$UnitPrice, 0.25) - iqr_price, col="red", lwd=2)
+```
+
+The IQR for UnitPrice is also narrow and concentrated towards the lower end of the price distribution, centered around $50/item which is one standard deviation below the mean. IQR is a better measure here of typical buying patterns, since it more accurately reflects the typical range of prices paid, ignoring the few very high outliers. The IQR is about the same as the standard deviation, indicating a fairly high level of variability in the middle 50% of sales profits.
+
+## Create the statistics moments for the dataset.
+
+```{r q5}
+# Load necessary libraries
+library(moments)
+
+# Moments for TotalSales
+moment1_sales <- mean(sales_data$TotalSales)
+moment2_sales <- var(sales_data$TotalSales)
+moment3_sales <- skewness(sales_data$TotalSales)
+moment4_sales <- kurtosis(sales_data$TotalSales)
+# Moments for QuantityOrdered
+moment1_quantity <- mean(sales_data$Quantity)
+moment2_quantity <- var(sales_data$Quantity)
+moment3_quantity <- skewness(sales_data$Quantity)
+moment4_quantity <- kurtosis(sales_data$Quantity)
+# Moments for UnitPrice
+moment1_price <- mean(sales_data$UnitPrice)
+moment2_price <- var(sales_data$UnitPrice)
+moment3_price <- skewness(sales_data$UnitPrice)
+moment4_price <- kurtosis(sales_data$UnitPrice)
+# Print moments for TotalSales
+cat("Moments for TotalSales:\n", "Mean:", moment1_sales, "\n", "Variance:", moment2_sales, "\n", "Skewness:", moment3_sales, "\n", "Kurtosis:", moment4_sales, "\n")
+# Print moments for QuantityOrdered
+cat("Moments for QuantityOrdered:\n", "Mean:", moment1_quantity, "\n", "Variance:", moment2_quantity, "\n", "Skewness:", moment3_quantity, "\n", "Kurtosis:", moment4_quantity, "\n")
+# Print moments for UnitPrice
+cat("Moments for UnitPrice:\n", "Mean:", moment1_price, "\n", "Variance:", moment2_price, "\n", "Skewness:", moment3_price, "\n", "Kurtosis:", moment4_price, "\n")
+```
+
+## Experiment with histogram binning for the categorical data in R.
+
+```{r q6}
+# Histogram for TotalSales with Arbitrary Binning
+hist(sales_data$TotalSales, main="Distribution of Sales with Arbitrary Binning", xlab="Sales", ylab="Frequency", col="lightblue", breaks=20)
+# Histogram for TotalSales with Sturges Binning
+hist(sales_data$TotalSales, main="Distribution of Sales with Sturges Binning", xlab="Sales", ylab="Frequency", col="lightblue", breaks="sturges")
+# Histogram for TotalSales with Friedman-Diaconis Binning
+hist(sales_data$TotalSales, main="Distribution of Sales with Friedman-Diaconis Binning", xlab="Sales", ylab="Frequency", col="lightblue", breaks="fd")
+```
