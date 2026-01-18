@@ -1,6 +1,6 @@
 ---
 title: "DSC 520 Exercise 4: Data Transformation and Imputation"
-author: "D. Jorgensen"
+author: "David Jorgensen"
 date: "2026-01-18"
 output:
   html_document:
@@ -38,7 +38,7 @@ set.seed(42)
 
 ```{r load_data}
 # Load the dataset
-df <- read.csv("./assets/exercise4/vgchartz-2024.csv")
+df <- read.csv("./vgchartz-2024.csv")
 
 # Display basic information
 cat("Dataset dimensions:", nrow(df), "rows,", ncol(df), "columns\n\n")
@@ -181,8 +181,6 @@ percent_max <- function(x) {
   if (x_max == 0) return(rep(100, length(x)))
   return((x / x_max) * 100)
 }
-
-cat("Transformation functions defined.\n\n")
 ```
 
 ```{r apply_transformations}
@@ -204,15 +202,16 @@ df$pal_sales_rank <- rank_transform(df$pal_sales)
 
 # Column 6: other_sales -> Fisher-Z Transform
 df$other_sales_fisherz <- fisher_z(df$other_sales)
-
-cat("Transformations Applied:\n")
-cat("1. critic_score -> Log Transform\n")
-cat("2. total_sales -> Square Root Transform\n")
-cat("3. na_sales -> Min-Max Scaling\n")
-cat("4. jp_sales -> Percent Change\n")
-cat("5. pal_sales -> Rank Transform\n")
-cat("6. other_sales -> Fisher-Z Transform\n\n")
 ```
+
+**Transformations Applied:**
+
+1. critic_score -> Log Transform
+2. total_sales -> Square Root Transform
+3. na_sales -> Min-Max Scaling
+4. jp_sales -> Percent Change
+5. pal_sales -> Rank Transform
+6. other_sales -> Fisher-Z Transform
 
 ```{r transformation_diagnostics}
 # Calculate skewness after transformations
@@ -237,19 +236,17 @@ skewness_after_rounded <- data.frame(
   Transformed_Skewness = round(skewness_after$Transformed_Skewness, 3)
 )
 print(skewness_after_rounded)
-
-cat("\nTransformations successfully applied to reduce skewness.\n\n")
 ```
 
+## Example Transformations
+
 ```{r transformation_examples}
-cat("Example transformations:\n\n")
 example_data <- data.frame(
   Original_total_sales = df$total_sales[1:5],
   Sqrt_transformed = df$total_sales_sqrt[1:5]
 )
 print(example_data)
 
-cat("\n")
 example_data2 <- data.frame(
   Original_na_sales = df$na_sales[1:5],
   MinMax_scaled = df$na_sales_minmax[1:5]
@@ -286,20 +283,20 @@ df$pal_sales_pctmax <- percent_max(df$pal_sales)
 
 # Column 6: other_sales - already has Fisher-Z, add minmax for comparison
 df$other_sales_minmax <- minmax_scale(df$other_sales)
-
-cat("Additional Normalization Methods Applied:\n")
-cat("critic_score: + Percent of Maximum\n")
-cat("total_sales: + Inverse Transform\n")
-cat("na_sales: + Z-score\n")
-cat("jp_sales: + Inverse Transform\n")
-cat("pal_sales: + Percent of Maximum\n")
-cat("other_sales: + Min-Max Scaling\n\n")
 ```
 
+**Normalization Methods Applied:**
+
+1. critic_score: Log, Percent of Maximum
+2. total_sales: Square Root, Inverse
+3. na_sales: Min-Max, Z-score
+4. jp_sales: Percent Change, Inverse
+5. pal_sales: Rank, Percent of Maximum
+6. other_sales: Fisher-Z, Min-Max
+
+## Summary of Normalizations
 ```{r normalization_summary}
 # Summary of normalization coverage
-cat("Normalization Methods Summary:\n\n")
-
 normalization_methods <- c("Z-scoring", "Min-Max Scaling", "Percent Change", 
                            "Rank Transform", "Fisher-Z", "Square Root", 
                            "Log", "Inverse")
@@ -348,10 +345,9 @@ for (col in normalized_cols_list) {
 
 Fill missing `release_date` values using predictive mean matching with other variables.
 
+## Release Date Analysis
 ```{r release_date_analysis}
 # Examine release_date variable
-cat("Release Date Analysis:\n")
-
 # First, treat empty strings as NA
 df$release_date[df$release_date == ""] <- NA
 
@@ -379,6 +375,7 @@ if (sum(!is.na(df$release_date_numeric)) > 0) {
 }
 ```
 
+## Imputation Model
 ```{r imputation_model}
 # Prepare data for imputation using Linear Regression-based approach
 # Use features that correlate with release date: console, genre, sales metrics, critic_score
@@ -423,30 +420,14 @@ if (sum(missing_cases_idx) > 0) {
   # Check which missing cases have no NAs in predictors
   complete_predictors <- complete.cases(missing_imputation_data[, -1])  # Exclude release_date_numeric (column 1)
   
-  cat("DEBUG: Among missing cases:\n")
-  cat("  Total:", nrow(missing_imputation_data), "\n")
-  cat("  With complete predictors:", sum(complete_predictors), "\n")
-  cat("  With missing predictors:", sum(!complete_predictors), "\n")
-  cat("  Predictor NAs by column:\n")
-  for (col in setdiff(colnames(missing_imputation_data), "release_date_numeric")) {
-    na_count <- sum(is.na(missing_imputation_data[[col]]))
-    if (na_count > 0) {
-      cat("    ", col, ":", na_count, " NAs\n")
-    }
-  }
-  
   # Only predict for cases with complete predictors
   if (sum(complete_predictors) > 0) {
     predicted_dates_temp <- predict(model, newdata = missing_imputation_data[complete_predictors, ])
-    
-    cat("DEBUG: Predicted dates (complete predictors only) - NAs:", sum(is.na(predicted_dates_temp)), 
-        ", Values:", sum(!is.na(predicted_dates_temp)), "\n\n")
     
     # Create full prediction vector with NAs for rows with missing predictors
     predicted_dates <- rep(NA_real_, nrow(missing_imputation_data))
     predicted_dates[complete_predictors] <- predicted_dates_temp
   } else {
-    cat("WARNING: No missing cases with complete predictor data - using mean imputation instead\n\n")
     # Fallback: use mean of complete cases
     predicted_dates <- rep(mean(df$release_date_numeric[complete_cases_idx], na.rm = TRUE), 
                           nrow(missing_imputation_data))
@@ -473,48 +454,17 @@ if (sum(missing_cases_idx) > 0) {
   
   # Create a new vector with imputed values
   imputed_dates_full <- df$release_date_numeric
-  cat("DEBUG: Before assignment - imputed_dates_full NAs:", sum(is.na(imputed_dates_full)), "\n")
-  cat("DEBUG: imputed_numeric length:", length(imputed_numeric), "\n")
-  cat("DEBUG: imputed_numeric class:", class(imputed_numeric), "\n")
-  cat("DEBUG: missing_cases_idx class:", class(missing_cases_idx), "\n")
-  cat("DEBUG: missing_cases_idx sum:", sum(missing_cases_idx), "\n")
-  cat("DEBUG: missing_cases_idx length:", length(missing_cases_idx), "\n")
-  cat("DEBUG: First 10 of imputed_numeric:\n")
-  print(head(imputed_numeric, 10))
-  cat("DEBUG: First 10 of missing_cases_idx:\n")
-  print(head(missing_cases_idx, 10))
   
   # Try direct assignment
-  cat("DEBUG: Attempting assignment...\n")
   imputed_dates_full[missing_cases_idx] <- imputed_numeric
-  
-  cat("DEBUG: After assignment - imputed_dates_full NAs:", sum(is.na(imputed_dates_full)), "\n")
-  cat("DEBUG: Non-NA values in imputed portion:", sum(!is.na(imputed_dates_full[missing_cases_idx])), "\n")
-  cat("DEBUG: Sample of imputed values (after assignment):\n")
-  imputed_sample <- imputed_dates_full[missing_cases_idx]
-  print(head(imputed_sample[!is.na(imputed_sample)], 5))
   
   # Assign back to dataframe
   df$release_date_numeric <- imputed_dates_full
   
-  cat("DEBUG: After df assignment - df$release_date_numeric NAs:", sum(is.na(df$release_date_numeric)), "\n\n")
-  
-  cat("Linear Regression-Based Imputation (with random noise):\n")
-  cat("Residual SD for noise:", round(residual_sd, 2), "\n")
-  cat("Number of imputed values:", sum(missing_cases_idx), "\n")
-  cat("Model summary:\n")
+  # Summarize imputation model
+  cat("Imputation Model Summary:\n")
   print(summary(model))
   cat("\n")
-  
-  # Verify imputation
-  imputed_test <- as.Date(imputed_numeric, origin = "1970-01-01")
-  cat("Imputed date range:\n")
-  cat("  Min:", as.character(min(imputed_test)), "\n")
-  cat("  Max:", as.character(max(imputed_test)), "\n")
-  cat("  Mean:", as.character(round(mean(imputed_test))), "\n\n")
-  
-  # Verify that imputation actually worked
-  cat("Verification - NAs in release_date_numeric after imputation:", sum(is.na(df$release_date_numeric)), "\n\n")
   
 } else {
   cat("No missing release date values found - no imputation needed.\n\n")
@@ -533,22 +483,9 @@ cat("Imputation Complete:\n")
 cat("Total missing values imputed:", sum(df$release_date_imputed_flag), "\n")
 cat("Total non-NA values in release_date_imputed:", sum(!is.na(df$release_date_imputed) & df$release_date_imputed != "NA"), "\n\n")
 
-# Show examples of imputed values
-cat("Examples of Imputed Release Dates:\n")
-if (sum(df$release_date_imputed_flag) > 0) {
-  imputed_indices <- which(df$release_date_imputed_flag)
-  imputed_examples <- df[imputed_indices[1:min(10, length(imputed_indices))], 
-                         c("title", "console", "genre", "total_sales", "release_date_imputed")]
-  print(imputed_examples)
-  
-  # Verify imputation worked
-  cat("\nVerification:\n")
-  cat("Non-NA imputed dates in sample:", sum(!is.na(imputed_examples$release_date_imputed) & imputed_examples$release_date_imputed != "NA"), "\n")
-} else {
-  cat("No missing release dates to impute.\n")
-}
 ```
 
+## Imputation Diagnostics and Visualization
 ```{r imputation_diagnostics}
 # Diagnostic plots comparing imputed vs non-missing release dates
 
@@ -641,9 +578,9 @@ print(sample_data)
 
 ```{r export_data}
 # Export the processed dataset
-write.csv(df, "./assets/exercise4/vgchartz-2024-processed.csv", row.names = FALSE)
+write.csv(df, "./vgchartz-2024-processed.csv", row.names = FALSE)
 
-cat("\n\nProcessed dataset exported to: assets/exercise4/vgchartz-2024-processed.csv\n")
+cat("\n\nProcessed dataset exported to: vgchartz-2024-processed.csv\n")
 cat("Total columns in output:", ncol(df), "\n")
 ```
 
@@ -682,7 +619,11 @@ cat("Total columns in output:", ncol(df), "\n")
 
 ## Output
 - Processed dataset contains original columns plus all transformed/normalized/scaled versions
-- Suitable for downstream statistical analysis and modeling
+
+# Interpretation of Results
+This was... difficult to put together. It felt like a whole bunch of new concepts at once, without much of a core understanding of statistical analysis as a foundation. We're learning tools, and the text tells us how important it is to know when to apply them, but the text assumes we already have the core knowledge necessary to sus that out. So there was a *lot* of googling.
+
+That being said, I think the transformations and imputation were successful. The skewness values improved significantly after transformation, and the imputation model seems reasonable based on the summary statistics and diagnostics. I'm not sure how accurate the transformed skewness is because NA and JP sales ended up with skewness measurements the same as the original, and Other was massively different (9 -> 29). But overall, I think this was a good exercise in applying various data transformation and imputation techniques.
 
 ---
 
