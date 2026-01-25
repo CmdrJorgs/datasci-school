@@ -1,0 +1,134 @@
+---
+title: "DSC 520 Exercise 5: Classical Probability"
+author: "David Jorgensen"
+date: "2026-01-25"
+output:
+  html_document:
+    theme: cosmo
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+```{r libraries}
+library(ggplot2)
+```
+
+# What is Probability Theory?
+
+Probability theory is a branch of mathematics that deals with the analysis of random phenomena. It provides a framework for quantifying uncertainty and making predictions about the likelihood of various outcomes. In data science, probability theory is essential for understanding and modeling uncertainty in data, making informed decisions based on incomplete information, and developing statistical models that can generalize from observed data to unseen scenarios.
+
+---
+
+# Exercises
+## 1. How many different license plates can be made from six digits?
+
+```{r license_plates}
+# Each digit can be from 0-9 or a letter from A-Z, so there are 36 choices for each of the 6 positions
+num_choices_per_digit <- 36
+num_digits <- 6
+total_license_plates <- num_choices_per_digit ^ num_digits
+
+cat("Total different license plates that can be made from six digits:", total_license_plates, "\n")
+```
+
+---
+
+## 2. When flipping a coin, what is the probability you will get heads three times in a row?
+
+```{r coin_flips}
+# Probability of heads on a fair coin is 0.5
+prob_heads <- 0.5
+# Probability of getting heads three times in a row
+prob_three_heads <- prob_heads ^ 3
+# Convert probability to percentage
+prob_three_heads_percent <- prob_three_heads * 100
+cat("Probability of getting heads three times in a row:", prob_three_heads, ", or ", prob_three_heads_percent, "%\n")
+
+# Calculate probability of heads x times in a row for x = 1 to 10
+x_values <- 1:10
+probabilities <- prob_heads ^ x_values
+
+# Create a data frame for visualization
+heads_data <- data.frame(
+  x = x_values,
+  probability = probabilities
+)
+
+# Plot the results
+ggplot(heads_data, aes(x = x, y = probability)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Probability of Getting Heads X Times in a Row",
+       x = "Number of Consecutive Heads (x)",
+       y = "Probability") +
+  scale_x_continuous(breaks = 1:10, limits = c(1, 10)) +
+  theme_minimal()
+```
+
+## 3. Given a standard 52 card deck of cards, what is the probability you’ll randomly draw an Ace of Spades and then Two of Hearts in a row?
+
+```{r cards}
+# Probability of drawing the Ace of Spades from a 52-card deck
+prob_ace_spades <- 1/52
+# Probability of drawing the Two of Hearts from a 52-card deck
+prob_two_hearts <- 1/52
+# Combined probability of drawing Ace of Spades and then Two of Hearts
+prob_ace_and_two <- prob_ace_spades * prob_two_hearts
+cat("Probability of drawing Ace of Spades and then Two of Hearts in a row:", prob_ace_and_two, "\n")
+```
+
+## 4. Knowing that the first die shows a 6, what is the probability that the sum of the two dice equals 9?
+
+```{r dice}
+# Given the first die shows a 6, we need the second die to show a 3 to make the sum 9
+# Probability of rolling a 3 on a fair six-sided die
+prob_rolling_3 <- 1/6
+cat("Probability of rolling a 3 on a fair six-sided die:", prob_rolling_3, "\n")
+```
+
+## 4. You have a 30% chance of making $70,000 and 70% chance of losing $40,000. Should you invest?
+```{r investment}
+# Define the outcomes and their probabilities
+gain <- 70000
+loss <- -40000
+prob_gain <- 0.3
+prob_loss <- 0.7
+# Calculate expected value of the investment
+expected_value <- (gain * prob_gain) + (loss * prob_loss)
+cat("Expected value of the investment:", expected_value, "\n")
+if (expected_value > 0) {
+  cat("You should invest, as the expected value is positive.\n")
+} else {
+  cat("You should not invest, as the expected value is negative.\n")
+}
+```
+
+## 5. A $2 lottery ticket offers a grand prize of $200,000; 5 losers are winners prizes each pay $1000; 15 third-place prizes each pay $300; and 25 fourth-place prizes each pay $10. Find the expected value of entering this contest if 5 million tickets are sold.
+```{r lottery}
+# Define the prizes and their probabilities
+grand_prize <- 200000
+second_prize <- 1000
+third_prize <- 300
+fourth_prize <- 10
+num_tickets <- 5000000
+# Calculate probabilities
+prob_grand <- 1 / num_tickets
+prob_second <- 5 / num_tickets
+prob_third <- 15 / num_tickets
+prob_fourth <- 25 / num_tickets
+# Calculate using the formula for expected value of a discrete random variable
+expected_value_lottery <- (grand_prize * prob_grand) +
+                          (second_prize * prob_second) +
+                          (third_prize * prob_third) +
+                          (fourth_prize * prob_fourth) -
+                          2  # Cost of the ticket 
+cat("Expected value of entering the lottery contest: $", expected_value_lottery, "\n")
+```
+
+---
+
+*Generated: `r Sys.Date()`*
