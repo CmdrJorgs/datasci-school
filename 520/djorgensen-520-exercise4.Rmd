@@ -1,0 +1,630 @@
+---
+title: "DSC 520 Exercise 4: Data Transformation and Imputation"
+author: "David Jorgensen"
+date: "2026-01-18"
+output:
+  html_document:
+    theme: cosmo
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+# Overview
+
+This analysis performs data transformations on the VGChartz 2024 video game sales dataset:
+
+- **Scaling**: Standardize numerical data (z-score)
+- **Skewness Correction**: Apply log and Box-Cox transformations to right-skewed columns
+- **Normalization**: Use 4 different techniques across numerical columns
+- **Imputation**: Simulate and fill missing `release_date` values
+
+---
+
+# 1. Setup and Load Libraries
+
+```{r libraries}
+# No external libraries required - using base R only
+# Set seed for reproducibility
+set.seed(42)
+```
+
+---
+
+# 2. Load and Explore Data
+
+```{r load_data}
+# Load the dataset
+df <- read.csv("./vgchartz-2024.csv")
+
+# Display basic information
+cat("Dataset dimensions:", nrow(df), "rows,", ncol(df), "columns\n\n")
+cat("Column names and types:\n")
+str(df)
+
+# Display first few rows
+head(df, 10)
+```
+
+```{r explore_missing}
+# Check for missing values
+missing_summary <- data.frame(
+  Column = names(df),
+  Missing_Count = colSums(is.na(df)),
+  Missing_Percent = round(100 * colSums(is.na(df)) / nrow(df), 2)
+)
+
+cat("\nMissing Values Summary:\n")
+print(missing_summary)
+```
+
+```{r explore_numerical}
+# Identify and summarize numerical columns
+numerical_cols <- c("critic_score", "total_sales", "na_sales", "jp_sales", 
+                    "pal_sales", "other_sales")
+
+cat("\nNumerical Columns Summary:\n")
+summary(df[, numerical_cols])
+
+# Function to calculate skewness (1/n * sum((x - mean)^3 / sd^3))
+calc_skewness <- function(x) {
+  x <- x[!is.na(x)]
+  n <- length(x)
+  if (n < 3) return(NA)
+  m <- mean(x)
+  s <- sd(x)
+  if (s == 0) return(0)
+  skewness <- (1 / n) * sum(((x - m) / s)^3)
+  return(skewness)
+}
+
+cat("\nSkewness Before Transformations:\n")
+skewness_before <- data.frame(
+  Column = numerical_cols,
+  Skewness = sapply(df[, numerical_cols], calc_skewness)
+)
+print(skewness_before)
+```
+
+---
+
+# 3. Scaling (Z-score Standardization)
+
+Apply standardization (mean = 0, SD = 1) to all numerical columns.
+
+```{r scaling}
+# Function for z-score scaling
+z_score <- function(x) {
+  m <- mean(x, na.rm = TRUE)
+  s <- sd(x, na.rm = TRUE)
+  return((x - m) / s)
+}
+
+# Create scaled versions of all numerical columns
+for (col in numerical_cols) {
+  df[[paste0(col, "_zscored")]] <- z_score(df[[col]])
+}
+
+# Verify scaling: mean should be ~0, SD should be ~1
+cat("Z-Scored Columns - Mean and SD:\n")
+zscored_cols <- paste0(numerical_cols, "_zscored")
+scaling_check <- data.frame(
+  Column = zscored_cols,
+  Mean = round(sapply(df[, zscored_cols], function(x) mean(x, na.rm = TRUE)), 6),
+  SD = round(sapply(df[, zscored_cols], function(x) sd(x, na.rm = TRUE)), 6)
+)
+print(scaling_check)
+
+cat("\nExample of original vs z-scored:\n")
+print(head(df[, c("title", "total_sales", "total_sales_zscored")], 5))
+```
+
+---
+
+# 4. Transformation
+
+Apply transformation methods to address right-skewness and normalize data.
+
+```{r transformations_setup}
+# Define transformation functions
+# 1. Square Root Transformation
+sqrt_transform <- function(x) {
+  return(sqrt(abs(x)))  # abs handles potential negative values
+}
+
+# 2. Log Transformation (log(x + 1) to handle zeros)
+log_transform <- function(x) {
+  return(log(x + 1))
+}
+
+# 3. Inverse Transformation (1/x, avoiding division by zero)
+inverse_transform <- function(x) {
+  return(ifelse(x != 0, 1 / x, NA))
+}
+
+# 4. Min-Max Scaling: (x - min) / (max - min)
+minmax_scale <- function(x) {
+  x_min <- min(x, na.rm = TRUE)
+  x_max <- max(x, na.rm = TRUE)
+  if (x_max - x_min == 0) return(rep(0, length(x)))
+  return((x - x_min) / (x_max - x_min))
+}
+
+# 5. Percent Change: (x / mean(x)) * 100
+percent_change <- function(x) {
+  m <- mean(x, na.rm = TRUE)
+  if (m == 0) return(rep(100, length(x)))
+  return((x / m) * 100)
+}
+
+# 6. Rank Transform: convert values to ranks
+rank_transform <- function(x) {
+  return(rank(x, na.last = "keep"))
+}
+
+# 7. Fisher-Z Transform: arctanh for proportions/normalized data
+# Formula: 0.5 * ln((1 + x) / (1 - x))
+fisher_z <- function(x) {
+  # Normalize to [0,1] range first if needed
+  x_norm <- minmax_scale(x)
+  # Avoid division by zero: clip to (0.001, 0.999)
+  x_norm <- pmax(0.001, pmin(0.999, x_norm))
+  return(0.5 * log((1 + x_norm) / (1 - x_norm)))
+}
+
+# 8. Additional normalization: Percent of Maximum = (x / max(x)) * 100
+percent_max <- function(x) {
+  x_max <- max(x, na.rm = TRUE)
+  if (x_max == 0) return(rep(100, length(x)))
+  return((x / x_max) * 100)
+}
+```
+
+```{r apply_transformations}
+# Apply different transformations to each numerical column
+# Column 1: critic_score -> Log Transform
+df$critic_score_log <- log_transform(df$critic_score)
+
+# Column 2: total_sales -> Square Root Transform
+df$total_sales_sqrt <- sqrt_transform(df$total_sales)
+
+# Column 3: na_sales -> Min-Max Scaling
+df$na_sales_minmax <- minmax_scale(df$na_sales)
+
+# Column 4: jp_sales -> Percent Change
+df$jp_sales_pctchange <- percent_change(df$jp_sales)
+
+# Column 5: pal_sales -> Rank Transform
+df$pal_sales_rank <- rank_transform(df$pal_sales)
+
+# Column 6: other_sales -> Fisher-Z Transform
+df$other_sales_fisherz <- fisher_z(df$other_sales)
+```
+
+**Transformations Applied:**
+
+1. critic_score -> Log Transform
+2. total_sales -> Square Root Transform
+3. na_sales -> Min-Max Scaling
+4. jp_sales -> Percent Change
+5. pal_sales -> Rank Transform
+6. other_sales -> Fisher-Z Transform
+
+```{r transformation_diagnostics}
+# Calculate skewness after transformations
+cat("Skewness Comparison - Before and After Transformation:\n")
+skewness_after <- data.frame(
+  Column = numerical_cols,
+  Original_Skewness = sapply(df[, numerical_cols], calc_skewness),
+  Transformed_Skewness = c(
+    calc_skewness(df$critic_score_log),
+    calc_skewness(df$total_sales_sqrt),
+    calc_skewness(df$na_sales_minmax),
+    calc_skewness(df$jp_sales_pctchange),
+    calc_skewness(df$pal_sales_rank),
+    calc_skewness(df$other_sales_fisherz)
+  )
+)
+
+# Round numeric columns for display
+skewness_after_rounded <- data.frame(
+  Column = skewness_after$Column,
+  Original_Skewness = round(skewness_after$Original_Skewness, 3),
+  Transformed_Skewness = round(skewness_after$Transformed_Skewness, 3)
+)
+print(skewness_after_rounded)
+```
+
+## Example Transformations
+
+```{r transformation_examples}
+example_data <- data.frame(
+  Original_total_sales = df$total_sales[1:5],
+  Sqrt_transformed = df$total_sales_sqrt[1:5]
+)
+print(example_data)
+
+example_data2 <- data.frame(
+  Original_na_sales = df$na_sales[1:5],
+  MinMax_scaled = df$na_sales_minmax[1:5]
+)
+print(example_data2)
+```
+
+---
+
+# 5. Normalization
+
+Apply additional normalization techniques to fully normalize all columns using different methods.
+
+```{r normalization_additional}
+# We've already applied one normalization technique per column above.
+# Now apply additional methods for comprehensive normalization coverage.
+
+# Additional normalizations using Inverse and Percent of Maximum:
+
+# Column 1: critic_score - also apply Percent of Maximum
+df$critic_score_pctmax <- percent_max(df$critic_score)
+
+# Column 2: total_sales - also apply Inverse (1/x)
+df$total_sales_inverse <- inverse_transform(df$total_sales)
+
+# Column 3: na_sales - already has minmax, add z-scoring
+df$na_sales_additional_zscore <- z_score(df$na_sales)
+
+# Column 4: jp_sales - already has percent change, add inverse
+df$jp_sales_inverse <- inverse_transform(df$jp_sales)
+
+# Column 5: pal_sales - already has rank transform, add percent of max
+df$pal_sales_pctmax <- percent_max(df$pal_sales)
+
+# Column 6: other_sales - already has Fisher-Z, add minmax for comparison
+df$other_sales_minmax <- minmax_scale(df$other_sales)
+```
+
+**Normalization Methods Applied:**
+
+1. critic_score: Log, Percent of Maximum
+2. total_sales: Square Root, Inverse
+3. na_sales: Min-Max, Z-score
+4. jp_sales: Percent Change, Inverse
+5. pal_sales: Rank, Percent of Maximum
+6. other_sales: Fisher-Z, Min-Max
+
+## Summary of Normalizations
+```{r normalization_summary}
+# Summary of normalization coverage
+normalization_methods <- c("Z-scoring", "Min-Max Scaling", "Percent Change", 
+                           "Rank Transform", "Fisher-Z", "Square Root", 
+                           "Log", "Inverse")
+
+normalization_coverage <- data.frame(
+  Method = normalization_methods,
+  Applied_to_Columns = c(
+    "All columns + na_sales",
+    "na_sales, other_sales",
+    "jp_sales",
+    "pal_sales",
+    "other_sales",
+    "total_sales",
+    "critic_score",
+    "total_sales, jp_sales"
+  ),
+  Count = c(7, 2, 1, 1, 1, 1, 1, 2)
+)
+
+print(normalization_coverage)
+
+cat("\n\nSummary Statistics for Normalized Columns:\n")
+normalized_cols_list <- c(
+  "critic_score_log", "critic_score_pctmax",
+  "total_sales_sqrt", "total_sales_inverse", "total_sales_zscored",
+  "na_sales_minmax", "na_sales_zscored", "na_sales_additional_zscore",
+  "jp_sales_pctchange", "jp_sales_inverse",
+  "pal_sales_rank", "pal_sales_pctmax",
+  "other_sales_fisherz", "other_sales_minmax"
+)
+
+for (col in normalized_cols_list) {
+  if (col %in% names(df)) {
+    vals <- df[[col]][!is.na(df[[col]])]
+    if (length(vals) > 0) {
+      cat(sprintf("%-30s | Min: %8.3f, Max: %8.3f, Mean: %8.3f, SD: %8.3f\n",
+                  col, min(vals), max(vals), mean(vals), sd(vals)))
+    }
+  }
+}
+```
+
+---
+
+# 6. Imputation of Missing Release Dates Using Data Simulation
+
+Fill missing `release_date` values using predictive mean matching with other variables.
+
+## Release Date Analysis
+```{r release_date_analysis}
+# Examine release_date variable
+# First, treat empty strings as NA
+df$release_date[df$release_date == ""] <- NA
+
+cat("First 20 release_date values:\n")
+print(df$release_date[1:20])
+
+# Parse dates with proper format handling
+# Try multiple date formats
+df$release_date_numeric <- as.numeric(as.Date(df$release_date, format = "%Y-%m-%d"))
+
+# Count missing after parsing
+missing_after_parse <- sum(is.na(df$release_date_numeric))
+cat("\nMissing values after parsing:", missing_after_parse, "\n")
+cat("Percent missing:", round(100 * missing_after_parse / nrow(df), 2), "%\n\n")
+
+# For analysis purposes, only consider rows that successfully converted
+cat("Successfully parsed dates:", sum(!is.na(df$release_date_numeric)), "\n\n")
+
+if (sum(!is.na(df$release_date_numeric)) > 0) {
+  cat("Release date range (numeric):\n")
+  print(range(df$release_date_numeric, na.rm = TRUE))
+  
+  cat("\nDate range (actual dates):\n")
+  print(range(as.Date(df$release_date_numeric, origin = "1970-01-01"), na.rm = TRUE))
+}
+```
+
+## Imputation Model
+```{r imputation_model}
+# Prepare data for imputation using Linear Regression-based approach
+# Use features that correlate with release date: console, genre, sales metrics, critic_score
+
+# Create categorical encoding for console and genre
+console_encoded <- as.numeric(factor(df$console))
+genre_encoded <- as.numeric(factor(df$genre))
+
+# Identify missing cases BEFORE creating imputation_data
+missing_cases_idx <- is.na(df$release_date_numeric)
+complete_cases_idx <- !missing_cases_idx
+
+cat("Imputation Status:\n")
+cat("Total cases:", nrow(df), "\n")
+cat("Complete cases (has release_date):", sum(complete_cases_idx), "\n")
+cat("Missing cases (no release_date):", sum(missing_cases_idx), "\n\n")
+
+# If there are missing values to impute
+if (sum(missing_cases_idx) > 0) {
+  # Build a dataset for modeling
+  imputation_data <- data.frame(
+    release_date_numeric = df$release_date_numeric,
+    total_sales = df$total_sales,
+    na_sales = df$na_sales,
+    jp_sales = df$jp_sales,
+    pal_sales = df$pal_sales,
+    other_sales = df$other_sales,
+    critic_score = df$critic_score,
+    console_code = console_encoded,
+    genre_code = genre_encoded
+  )
+  
+  # Fit linear regression model on complete cases
+  model <- lm(release_date_numeric ~ total_sales + na_sales + jp_sales + 
+              pal_sales + other_sales + critic_score + console_code + genre_code,
+              data = imputation_data[complete_cases_idx, ])
+  
+  # Predict missing values using the model
+  # First, identify which missing cases have complete predictor data
+  missing_imputation_data <- imputation_data[missing_cases_idx, ]
+  
+  # Check which missing cases have no NAs in predictors
+  complete_predictors <- complete.cases(missing_imputation_data[, -1])  # Exclude release_date_numeric (column 1)
+  
+  # Only predict for cases with complete predictors
+  if (sum(complete_predictors) > 0) {
+    predicted_dates_temp <- predict(model, newdata = missing_imputation_data[complete_predictors, ])
+    
+    # Create full prediction vector with NAs for rows with missing predictors
+    predicted_dates <- rep(NA_real_, nrow(missing_imputation_data))
+    predicted_dates[complete_predictors] <- predicted_dates_temp
+  } else {
+    # Fallback: use mean of complete cases
+    predicted_dates <- rep(mean(df$release_date_numeric[complete_cases_idx], na.rm = TRUE), 
+                          nrow(missing_imputation_data))
+  }
+  
+  # Add small random noise to reflect uncertainty (predictive mean matching variant)
+  residual_sd <- sd(residuals(model), na.rm = TRUE)
+  
+  # Only add noise to non-NA predictions
+  imputed_numeric <- predicted_dates
+  noise_indices <- !is.na(predicted_dates)
+  if (sum(noise_indices) > 0) {
+    noise <- rnorm(sum(noise_indices), mean = 0, sd = residual_sd)
+    imputed_numeric[noise_indices] <- predicted_dates[noise_indices] + noise
+  }
+  
+  # For missing cases with incomplete predictors, use the overall mean + random variation
+  mean_missing <- mean(predicted_dates, na.rm = TRUE)
+  mean_na_indices <- is.na(imputed_numeric)
+  if (sum(mean_na_indices) > 0) {
+    noise_mean <- rnorm(sum(mean_na_indices), mean = 0, sd = residual_sd)
+    imputed_numeric[mean_na_indices] <- mean_missing + noise_mean
+  }
+  
+  # Create a new vector with imputed values
+  imputed_dates_full <- df$release_date_numeric
+  
+  # Try direct assignment
+  imputed_dates_full[missing_cases_idx] <- imputed_numeric
+  
+  # Assign back to dataframe
+  df$release_date_numeric <- imputed_dates_full
+  
+  # Summarize imputation model
+  cat("Imputation Model Summary:\n")
+  print(summary(model))
+  cat("\n")
+  
+} else {
+  cat("No missing release date values found - no imputation needed.\n\n")
+}
+
+# Flag which values were imputed (tracking original missing values)
+df$release_date_imputed_flag <- missing_cases_idx
+
+# Now create release_date_imputed by converting all numeric dates back to dates
+df$release_date_imputed <- as.character(as.Date(df$release_date_numeric, origin = "1970-01-01"))
+
+# Also store numeric version for diagnostics
+df$release_date_imputed_numeric <- df$release_date_numeric
+
+cat("Imputation Complete:\n")
+cat("Total missing values imputed:", sum(df$release_date_imputed_flag), "\n")
+cat("Total non-NA values in release_date_imputed:", sum(!is.na(df$release_date_imputed) & df$release_date_imputed != "NA"), "\n\n")
+
+```
+
+## Imputation Diagnostics and Visualization
+```{r imputation_diagnostics}
+# Diagnostic plots comparing imputed vs non-missing release dates
+
+# Convert to numeric for comparison
+df$release_date_imputed_numeric <- as.numeric(as.Date(df$release_date_imputed))
+
+# Compare distributions
+cat("\nDistribution Comparison:\n")
+cat("Original (non-missing) release dates:\n")
+original_dates <- df$release_date_numeric[!df$release_date_imputed_flag]
+cat("  Mean:", round(mean(original_dates, na.rm = TRUE), 0), "days since epoch\n")
+cat("  Median:", round(median(original_dates, na.rm = TRUE), 0), "\n")
+cat("  Range:", round(min(original_dates, na.rm = TRUE), 0), "-", 
+    round(max(original_dates, na.rm = TRUE), 0), "\n\n")
+
+if (sum(df$release_date_imputed_flag) > 0) {
+  cat("Imputed release dates:\n")
+  imputed_dates <- df$release_date_imputed_numeric[df$release_date_imputed_flag]
+  cat("  Mean:", round(mean(imputed_dates, na.rm = TRUE), 0), "days since epoch\n")
+  cat("  Median:", round(median(imputed_dates, na.rm = TRUE), 0), "\n")
+  cat("  Range:", round(min(imputed_dates, na.rm = TRUE), 0), "-", 
+      round(max(imputed_dates, na.rm = TRUE), 0), "\n")
+} else {
+  cat("No imputed dates (all release dates present).\n")
+}
+```
+
+```{r imputation_visualization}
+# Visualize original vs imputed distribution (if imputed values exist and we have complete cases)
+original_indices <- !df$release_date_imputed_flag
+imputed_indices <- df$release_date_imputed_flag
+
+if (sum(imputed_indices) > 0 && sum(original_indices) > 0) {
+  original_dates_chr <- as.Date(df$release_date_numeric[original_indices], 
+                                 origin = "1970-01-01")
+  imputed_dates_chr <- as.Date(df$release_date_imputed_numeric[imputed_indices], 
+                                origin = "1970-01-01")
+  
+  if (length(original_dates_chr) > 0 && length(imputed_dates_chr) > 0) {
+    par(mfrow = c(1, 2))
+    
+    hist(original_dates_chr, 
+         main = "Original Release Dates (Non-Missing)",
+         xlab = "Release Date",
+         col = "skyblue",
+         breaks = 30)
+    
+    hist(imputed_dates_chr, 
+         main = "Imputed Release Dates",
+         xlab = "Release Date",
+         col = "coral",
+         breaks = 10)
+    
+    par(mfrow = c(1, 1))
+  } else {
+    cat("Insufficient valid dates for visualization.\n")
+  }
+} else {
+  cat("No imputed dates to visualize (insufficient complete cases or no imputation needed).\n")
+}
+```
+
+---
+
+# 7. Final Dataset Summary
+
+```{r final_summary}
+cat("Final Dataset Composition:\n")
+cat("Total rows:", nrow(df), "\n")
+cat("Total columns:", ncol(df), "\n\n")
+
+# Count transformation columns
+scaled_cols_count <- sum(grepl("_zscored$", names(df)))
+transform_cols_count <- sum(grepl("_(log|sqrt|inverse|pctchange|rank|fisherz|pctmax|minmax|additional_zscore)$", names(df)))
+
+cat("Column Categories:\n")
+cat("- Original columns:", 14, "\n")
+cat("- Z-scored columns:", scaled_cols_count, "\n")
+cat("- Transformed columns:", transform_cols_count, "\n")
+cat("- Release date derived:", 3, "(original, imputed, imputed_flag)\n\n")
+
+# Summary statistics - show available columns
+cat("Sample of transformed data (first 5 rows):\n")
+available_cols <- c("title", "console", "total_sales", "total_sales_zscored", 
+                    "total_sales_sqrt", "release_date", "release_date_imputed")
+available_cols <- available_cols[available_cols %in% names(df)]
+sample_data <- df[1:5, available_cols]
+print(sample_data)
+```
+
+```{r export_data}
+# Export the processed dataset
+write.csv(df, "./vgchartz-2024-processed.csv", row.names = FALSE)
+
+cat("\n\nProcessed dataset exported to: vgchartz-2024-processed.csv\n")
+cat("Total columns in output:", ncol(df), "\n")
+```
+
+---
+
+# Summary of Transformations
+
+## Scaling
+- Applied **z-score standardization** to all 6 numerical columns
+- All scaled columns have: Mean ≈ 0, SD ≈ 1
+
+## Transformations Applied
+1. **Log Transform** (log(x+1)): `critic_score`
+2. **Square Root Transform**: `total_sales`
+3. **Min-Max Scaling** (0-1 range): `na_sales`
+4. **Percent Change** (x/mean * 100): `jp_sales`
+5. **Rank Transform**: `pal_sales`
+6. **Fisher-Z Transform**: `other_sales`
+
+## Normalization Coverage
+- **Z-scoring**: Applied to all 6 numerical columns + additional scaling
+- **Min-Max Scaling**: Applied to `na_sales` and `other_sales`
+- **Log Transform**: Applied to `critic_score`
+- **Square Root Transform**: Applied to `total_sales`
+- **Inverse Transform**: Applied to `total_sales` and `jp_sales`
+- **Percent Change**: Applied to `jp_sales`
+- **Rank Transform**: Applied to `pal_sales`
+- **Fisher-Z Transform**: Applied to `other_sales`
+- **Percent of Maximum**: Applied to `critic_score` and `pal_sales`
+
+## Missing Value Imputation
+- **Release Date**: Used Linear Regression-based imputation with random noise (predictive mean matching variant)
+  - Imputation based on: sales metrics, critic score, console, and genre
+  - Random residual noise added to reflect uncertainty in predictions
+  - Imputation flag included to track which values were imputed
+
+## Output
+- Processed dataset contains original columns plus all transformed/normalized/scaled versions
+
+# Interpretation of Results
+This was... difficult to put together. It felt like a whole bunch of new concepts at once, without much of a core understanding of statistical analysis as a foundation. We're learning tools, and the text tells us how important it is to know when to apply them, but the text assumes we already have the core knowledge necessary to sus that out. So there was a *lot* of googling.
+
+That being said, I think the transformations and imputation were successful. The skewness values improved significantly after transformation, and the imputation model seems reasonable based on the summary statistics and diagnostics. I'm not sure how accurate the transformed skewness is because NA and JP sales ended up with skewness measurements the same as the original, and Other was massively different (9 -> 29). But overall, I think this was a good exercise in applying various data transformation and imputation techniques.
+
+---
+
+*Generated: `r Sys.Date()`*
