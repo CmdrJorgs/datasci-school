@@ -17,12 +17,6 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 library(ggplot2)
 ```
 
-# What is Probability Theory?
-
-Probability theory is a branch of mathematics that deals with the analysis of random phenomena. It provides a framework for quantifying uncertainty and making predictions about the likelihood of various outcomes. In data science, probability theory is essential for understanding and modeling uncertainty in data, making informed decisions based on incomplete information, and developing statistical models that can generalize from observed data to unseen scenarios.
-
----
-
 # Exercises
 
 ## 1. Six sided die
