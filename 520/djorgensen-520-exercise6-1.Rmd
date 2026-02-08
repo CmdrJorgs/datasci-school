@@ -1,0 +1,135 @@
+---
+title: "DSC 520 Exercise 6-1"
+author: "David Jorgensen"
+date: "2026-02-01"
+output:
+  html_document:
+    theme: cosmo
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+```{r libraries}
+library(ggplot2)
+```
+
+# Exercises
+
+## 1. Six sided die
+
+A six-sided die is rolled repeatedly. What is the expected value average as the die is rolled more and more? The expected value for a single roll is 1+2+3+4+5+6 / 6 = 3.5. What’s wrong with the answer, just in logical terms? Create this in R (i.e., simulate many rolls and visualize the results).
+
+```{r six_sided_die}
+# set.seed(123)  # For reproducibility
+num_rolls <- 10000
+rolls <- sample(1:6, num_rolls, replace = TRUE)
+# Calculate cumulative average
+cumulative_average <- cumsum(rolls) / seq_along(rolls)
+# Create a data frame for visualization
+die_data <- data.frame(
+  roll_number = seq_along(rolls),
+  cumulative_average = cumulative_average
+)
+# Plot the cumulative average
+ggplot(die_data, aes(x = roll_number, y = cumulative_average)) +
+  geom_line(color = "blue") +
+  geom_hline(yintercept = 3.5, linetype = "dashed", color = "red") +
+  labs(title = "Cumulative Average of Six-Sided Die Rolls",
+       x = "Number of Rolls",
+       y = "Cumulative Average") +
+  theme_minimal()
+cat("Final cumulative average after", num_rolls, "rolls:", tail(cumulative_average, 1), "\n")
+```
+
+The calculation of the expected value is correct; however, it represents a theoretical average over an infinite number of rolls. In practical terms, when rolling a die a finite number of times, the actual average may differ from 3.5 due to randomness and variability in the outcomes. As more rolls are conducted, the average will tend to approach the expected value, but it may never be exactly 3.5 in a finite sample.
+
+---
+
+## 2. Colored balls
+
+A box contains 30 red balls and 15 green balls. A ball is drawn from the box, and the color is written down. The ball is then returned to the box, and the process is repeated. What is the expected proportion of red balls drawn as the number of draws increases? Create this in R (i.e., simulate the draws from the box and visualize the results).
+
+```{r colored_balls}
+# set.seed(456)  # For reproducibility
+num_draws <- 10000
+balls <- c(rep("red", 30), rep("green", 15))
+draws <- sample(balls, num_draws, replace = TRUE)
+
+# Calculate cumulative proportion of red balls
+cumulative_red_proportion <- cumsum(draws == "red") / seq_along(draws)
+
+# Create a data frame for visualization
+balls_data <- data.frame(
+  draw_number = seq_along(draws),
+  cumulative_red_proportion = cumulative_red_proportion
+)
+
+# Plot the cumulative proportion of red balls
+ggplot(balls_data, aes(x = draw_number, y = cumulative_red_proportion)) +
+  geom_line(color = "green") +
+  geom_hline(yintercept = 30 / (30 + 15), linetype = "dashed", color = "red") +
+  labs(title = "Cumulative Proportion of Red Balls Drawn",
+       x = "Number of Draws",
+       y = "Cumulative Proportion of Red Balls") +
+  theme_minimal()
+cat("Final cumulative proportion of red balls after", num_draws, "draws:", tail(cumulative_red_proportion, 1), "\n")
+```
+
+The expected proportion of red balls drawn is 30 / (30 + 15) = 0.6667 or 66.67%. As the number of draws increases, the cumulative proportion of red balls drawn will tend to approach this expected value due to the law of large numbers.
+
+---
+
+## 3. Chapter 9 Exercise 1
+
+Each sample in the experiment comprises 200 data points randomly drawn from a normal distribution as x ~ N(0,r^2), where r^2 is a variance term that ranges from .1 to 10 in 40 steps, with one value of r^2 in each iteration of a for-loop. For each iteration, compute and store the mean and variance of the sample. To generate a sample estimate distribution, repeat this procedure 20 times for each r^2.
+```{r exercise_9_1}
+# set.seed(789)  # For reproducibility
+r2_values <- seq(0.1, 10, length.out = 40)
+num_samples <- 20
+
+# Initialize data frame to store results
+results <- data.frame()
+for (r2 in r2_values) {
+  for (i in 1:num_samples) {
+    sample_data <- rnorm(200, mean = 0, sd = sqrt(r2)) # Generate sample
+    sample_mean <- mean(sample_data)
+    sample_variance <- var(sample_data)
+    results <- rbind(results, data.frame(r2 = r2, sample_mean = sample_mean, sample_variance = sample_variance))
+  }
+}
+# Calculate variance of averages
+mean_variance <- aggregate(sample_mean ~ r2, data = results, FUN = var)
+
+# Plot sample means
+ggplot(results, aes(x = r2, y = sample_mean)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "loess", color = "blue") +
+  labs(title = "Sample Means vs Variance (r^2)",
+       x = "Variance (r^2)",
+       y = "Sample Mean") +
+  theme_minimal()
+
+# Plot sample variances and variance of averages
+ggplot() +
+  geom_point(data = results, aes(x = r2, y = sample_variance), alpha = 0.5) +
+  geom_smooth(data = results, aes(x = r2, y = sample_variance), method = "loess", color = "red") +
+  geom_line(data = mean_variance, aes(x = r2, y = sample_mean), color = "blue", linetype = "dashed") +
+  labs(title = "Sample Variances vs Variance (r^2) and Variance of Averages",
+       x = "Variance (r^2)",
+       y = "Sample Variance") +
+  theme_minimal() +
+  scale_color_manual(name = "Legend", 
+                     values = c("Sample Variance" = "red", "Variance of Averages" = "blue"),
+                     labels = c("Sample Variance", "Variance of Averages")) +
+  guides(color = guide_legend(override.aes = list(linetype = c(1, 2))))
+```
+
+As the variance (r^2) increases, the sample means remain centered around 0, while the sample variances increase correspondingly. The variance of the averages (dashed blue line) tends to be lower than the individual sample variances, illustrating the effect of averaging in reducing variability.
+
+---
+
+*Generated: `r Sys.Date()`*
