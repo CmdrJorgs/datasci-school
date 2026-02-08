@@ -1,0 +1,160 @@
+---
+title: "DSC 520 Exercise 6-2"
+author: "David Jorgensen"
+date: "2026-02-01"
+output:
+  html_document:
+    theme: cosmo
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+```{r libraries}
+library(ggplot2)
+library(truncnorm)
+library(cowplot)
+library(scales)
+```
+
+# Exercises
+
+## Part 1
+
+An experiment is executed to determine if spending too much time on social media hurts cognitive ability. The following data is a summary of that experiment:
+
+| Social | Higher | Lower |
+|--------|--------|-------|
+| Y      | 1      | 120   |
+| N      | 118    | 2     |
+
+Assuming the null hypothesis is that using social does not result in lower cognitive ability, and alpha is .05:
+
+- What is the alternative hypothesis?
+  - Using social media is associated with a higher probability of lower cognitive ability.
+- What is the p-value?
+```{r fisher_test}
+    # Create the contingency table
+    contingency_table <- matrix(c(1, 120, 118, 2), nrow = 2, byrow = TRUE)
+    # Perform Fisher's Exact Test
+    fisher_result <- fisher.test(contingency_table, alternative = "less")
+```
+  - Using Fisher's Exact Test, the p-value is `r fisher_result$p.value`.
+- Is the null hypothesis proven or disproven and why?
+  - The null hypothesis is neither definitively proven nor disproven, but We reject H0 at the 0.05 level. The data provides strong evidence against "no association" and in favor of the claim that social media use is associated with lower cognitive ability.
+- Is this a one-sided or two-sided test?
+  - This is a one-sided test because the alternative hypothesis specifies a direction (that using social media results in lower cognitive ability).
+
+You toss a two-sided coin 100 times. Assuming the null hypothesis is that the coin is a fair coin and alpha is .05:
+
+- What is the alternative hypothesis?
+  - The coin is biased (not fair), meaning it does not have an equal probability of landing on heads or tails.
+- If the coin is heads 95 times, what is the p-value?
+```{r binom_test}
+    # Perform Binomial Test
+    binom_result <- binom.test(95, 100, p = 0.5, alternative = "two.sided")
+```
+  - The p-value from the binomial test is `r binom_result$p.value`.
+- Is the null hypothesis proven or disproven and why?
+  - The null hypothesis is rejected because the p-value is less than alpha (0.05). This indicates that the observed number of heads (95) is statistically unlikely under the assumption that the coin is fair.
+- Is this a one-sided or two-sided test, and why?
+  - This is a two-sided test because the alternative hypothesis does not specify a direction; it tests for any deviation from fairness (either more heads or more tails).
+
+
+---
+
+## Part 2
+
+Modify the code for figure 10.5 so that you can specify any desired p-value.
+
+```{r figure_10_5}
+#-------- Figure 10.5: p-values and thresholds ---------#
+#-------------------------------------------------------#
+
+# Define desired p-value
+desired_p_value <- 0.08  # Change this value as needed
+
+# create a Gaussian probability curve
+zvals <- seq(-3, 3, length=1001)
+zpdf <- dnorm(zvals)
+
+# plot the probability function and the vertical lines
+df1 <- data.frame(x=zvals, y=zpdf)
+fig_A <- ggplot(df1, aes(x=x, y=y)) +
+           geom_smooth(color="black") +
+           scale_x_continuous(limit=c(head(zvals, 1), tail(zvals, 1)), expand=c(0, 0)) +
+           scale_y_continuous(limit=c(0, .42), breaks=NULL, expand=c(0, 0)) +
+           labs(x="", y=expression(paste("Prob. given ", "H"[0]))) +
+           theme_classic()
+
+# two-tailed p-values
+mn_idx <- which.min(zvals**2)
+pvalsL <- pnorm(zvals[1:mn_idx])
+pvalsR <- 1 - pnorm(zvals[(mn_idx+1):length(zvals)])
+pvals2 <- 2 * c(pvalsL, pvalsR)
+
+# plot the probability function (hardcoded p value lines changed to desired_p_value variable reference)
+df2 <- data.frame(x=zvals, y=pvals2)
+fig_B <- ggplot(df2, aes(x=x, y=y)) +
+           geom_line(color="black") +
+           geom_hline(yintercept=desired_p_value, color="gray50", linetype="dashed") +
+           scale_x_continuous(limit=c(head(zvals, 1), tail(zvals, 1)), expand=c(0, 0)) +
+           labs(x="", y="P-value") +
+           theme_classic()
+
+# draw vertical lines
+vline1 <- geom_vline(aes(xintercept=zvals[which.min((zvals-qnorm(.025))**2)]), color="darkgray",
+                     linetype="dotted", linewidth=.75)
+vline2 <- geom_vline(aes(xintercept=zvals[which.min((zvals-qnorm(.975))**2)]), color="darkgray",
+                     linetype="dotted", linewidth=.75)
+fig_A <- fig_A + vline1 + vline2
+fig_B <- fig_B + vline1 + vline2
+
+# draw patches for significant regions
+zidx <- which.min((zvals-qnorm(.025))**2)
+fig_A <- fig_A + geom_ribbon(data=subset(df1, x <= x[zidx]), aes(ymin=0, ymax=y), alpha=.4)
+fig_B <- fig_B + geom_ribbon(data=subset(df2, x <= x[zidx]), aes(ymin=0, ymax=y), alpha=.4)
+
+zidx <- which.min((zvals-qnorm(.975))**2)
+fig_A <- fig_A + geom_ribbon(data=subset(df1, x >= x[zidx]), aes(ymin=0, ymax=y), alpha=.4)
+fig_B <- fig_B + geom_ribbon(data=subset(df2, x >= x[zidx]), aes(ymin=0, ymax=y), alpha=.4)
+
+fig_C <- fig_B
+
+# indicators (hardcoded p value lines changed to desired_p_value variable reference)
+fig_A <- fig_A + annotate("text", x=0, y=.3, label='\"Not Significant\"') +
+  annotate("segment", x=-2.35, xend=-2.2, y=.12, yend=desired_p_value, lwd=1.25, linejoin="mitre",
+           arrow=arrow(type="closed", length=unit(.02, "npc"))) +
+  annotate("text", x=-2.375, y=.15, label='\"Significant\"') +
+  annotate("segment", x=2.35, xend=2.2, y=.12, yend=desired_p_value, lwd=1.25, linejoin="mitre",
+           arrow=arrow(type="closed", length=unit(.02, "npc"))) +
+  annotate("text", x=2.375, y=.15, label='\"Significant\"')
+
+fig_B <- fig_B + annotate("text", x=2.4, y=.12, label=paste("p=", desired_p_value))
+fig_C <- fig_C + annotate("text", x=2.4, y=.0975, label=paste("p=", desired_p_value))
+
+# panel titles
+fig_A <- fig_A + ggtitle(expression(paste(bold("A)  "), "Test statistic distribution if ", "H"[0], " were true")))
+fig_B <- fig_B + ggtitle(expression(paste(bold("B)  "), "P-value for each test statistic")))
+fig_C <- fig_C + ggtitle(expression(paste(bold("C)  "), "Same as panel ", bold("B"), " but in log scale")))
+
+fig_B <- fig_B + scale_y_continuous(limits=c(0, 1.03), breaks=seq(0, 1, .5), expand=c(0, 0))
+fig_C <- fig_C + xlab("Test statistic (z-score)") +
+           scale_y_log10(labels=trans_format("log10", math_format(10^.x))) +
+           annotation_logticks(sides="l", outside=TRUE, size=.25,
+                               short=unit(.075, "cm"), mid=unit(.125, "cm"), long=unit(.175, "cm")) +
+           coord_cartesian(clip="off") +
+           theme(axis.ticks.y=element_blank())
+
+fig <- plot_grid(fig_A, fig_B, fig_C, ncol=1, align="v", axis="l")
+
+fig
+ggsave(filename="hyp_sigRegionsZandP.png", width=7, height=7, units="in", dpi=300)
+```
+
+---
+
+*Generated: `r Sys.Date()`*
