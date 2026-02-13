@@ -1,0 +1,82 @@
+---
+title: "DSC 520 Exercise 7"
+author: "David Jorgensen"
+date: "2026-02-08"
+output:
+  html_document:
+    theme: cosmo
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+```{r libraries}
+
+```
+
+# Exercise 7
+
+## Question
+
+A researcher hypothesizes that TV stimulation for kids will result in an increase in the number of pieces of candy corn eaten. The kids are subjected to 5 hours of television. The number of candy corn candies consumed during a 10-minute period is counted both with and without TV. Compute the appropriate t-test for the data provided below.
+
+| Experiment # | With TV | Without TV |
+| --- | --- | --- |
+| 1 | 12 | 8 |
+| 2 | 7 | 7 |
+| 3 | 3 | 4 |
+| 4 | 11 | 14 |
+| 5 | 8 | 6 |
+| 6 | 5 | 7 |
+| 7 | 14 | 12 |
+| 8 | 7 | 5 |
+| 9 | 9 | 5 |
+| 10 | 10 | 8 |
+
+## Computations
+
+### What is your computed answer for the following, based on the data in the table above?
+
+```{r table_to_vector}
+    # Create the data vectors
+    with_tv <- c(12, 7, 3, 11, 8, 5, 14, 7, 9, 10)
+    without_tv <- c(8, 7, 4, 14, 6, 7, 12, 5, 5, 8)
+```
+
+| With TV | Without TV |
+| --- | --- |
+| Mean = `r mean(with_tv)` | Mean = `r mean(without_tv)` |
+| S = `r sd(with_tv)` | S = `r sd(without_tv)` |
+| S2 = `r var(with_tv)` | S2 = `r var(without_tv)` |
+
+### What is your computed t-test answer?
+```{r t_test}    
+    # Perform the paired t-test
+    t_test_result <- t.test(with_tv, without_tv, paired = TRUE)
+    t_test_result
+```
+
+## Interpretation of Results
+
+### What is the null hypothesis in this study?
+
+TV stimulation does not increase the number of pieces of candy corn eaten.
+
+### What is the alternate hypothesis?
+
+TV stimulation does increase the number of pieces of candy corn eaten.
+
+### What probability level did you choose and why?
+
+I chose a probability level (alpha) of 0.05, which is a common threshold for determining statistical significance in many scientific studies. This means that if the p-value from the t-test is less than 0.05, we would reject the null hypothesis and conclude that there is a statistically significant difference in candy corn consumption between the two conditions. Choosing this level helps to balance the risk of Type I errors (false positives) while still being sensitive enough to detect meaningful differences if they exist.
+
+### What are your degrees of freedom?
+
+The degrees of freedom (`df`) for a paired t-test is `n - 1`, where `n` is the number of pairs. In this case, `n = 10`, so `df = 9`.
+
+### Is there a significant difference between the two testing conditions? Interpret your answer.
+
+The t-test result shows a p-value of .2208, which is greater than the chosen alpha level of 0.05. Therefore, we fail to reject the null hypothesis. This means that there is not enough evidence to conclude that TV stimulation has a significant effect on the number of pieces of candy corn eaten. The observed difference in means could be due to random chance rather than a true effect of TV stimulation.
