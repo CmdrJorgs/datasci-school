@@ -1,0 +1,111 @@
+---
+title: "DSC 520 Exercise 8"
+author: "David Jorgensen"
+date: "2026-02-15"
+output:
+  html_document:
+    theme: cosmo
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+```{r libraries}
+
+# Load assets/travel_insurance.csv
+travel_insurance <- read.csv("C:\\temp\\git\\datasci-school\\520\\travel_insurance.csv")
+# Remove spaces and punctuation from column names
+colnames(travel_insurance) <- gsub("[[:space:][:punct:]]", "", colnames(travel_insurance))
+# Print column names to verify changes
+colnames(travel_insurance)
+```
+
+# Exercise 8
+
+## Correlation
+
+Compute the correlation coefficient between any two variables.
+```{r correlation}
+    # Compute the correlation coefficient between Duration and Commision
+    correlation <- cor(travel_insurance$Duration, travel_insurance$Commisioninvalue)
+    correlation
+```
+
+Compute the Pearson, Spearman, and Kendall correlations between any two variables.
+```{r correlations}
+    # Compute Pearson correlation
+    pearson_corr <- cor(travel_insurance$Duration, travel_insurance$Commisioninvalue, method = "pearson")
+    # Compute Spearman correlation
+    spearman_corr <- cor(travel_insurance$Duration, travel_insurance$Commisioninvalue, method = "spearman")
+    # Compute Kendall correlation
+    kendall_corr <- cor(travel_insurance$Duration, travel_insurance$Commisioninvalue, method = "kendall")
+```
+
+Create a correlation matrix for all variables.
+```{r correlation_matrix}
+    # Select only numeric columns for correlation matrix
+    numeric_data <- travel_insurance[sapply(travel_insurance, is.numeric)]
+    # Compute the correlation matrix
+    correlation_matrix <- cor(numeric_data, use = "pairwise.complete.obs")
+    correlation_matrix
+```
+
+Compute the covariance between any two variables.
+```{r covariance}
+    # Compute the covariance between Duration and Commission
+    covariance <- cov(travel_insurance$Duration, travel_insurance$Commisioninvalue, use = "pairwise.complete.obs")
+    covariance
+```
+
+Compute the Cosine Similarity between the same two variables as you used for #2. Plot the two together.
+```{r cosine_similarity}
+    # Compute Cosine Similarity
+    cosine_similarity <- sum(travel_insurance$Duration * travel_insurance$Commisioninvalue) / 
+                         (sqrt(sum(travel_insurance$Duration^2)) * sqrt(sum(travel_insurance$Commisioninvalue^2)))
+    cosine_similarity
+    # Plot Duration vs Commission
+    plot(travel_insurance$Duration, travel_insurance$Commisioninvalue, 
+         main = "Duration vs Commission", 
+         xlab = "Duration", 
+         ylab = "Commission", 
+         pch = 19, 
+         col = "blue")
+```
+
+## Confidence Intervals
+
+Compute the average confidence interval for each numeric feature.
+```{r confidence_intervals}
+    # Compute confidence intervals for each numeric feature
+    confidence_intervals <- sapply(numeric_data, function(x) {
+        mean_x <- mean(x, na.rm = TRUE)
+        sd_x <- sd(x, na.rm = TRUE)
+        n_x <- sum(!is.na(x))
+        error_margin <- qt(0.975, df = n_x - 1) * (sd_x / sqrt(n_x))
+        lower_bound <- mean_x - error_margin
+        upper_bound <- mean_x + error_margin
+        return(c(lower_bound, upper_bound))
+    })
+    confidence_intervals
+```
+
+Compute the t-scores for each numeric feature.
+```{r t_scores}
+    # Compute t-scores for each numeric feature
+    t_scores <- sapply(numeric_data, function(x) {
+        mean_x <- mean(x, na.rm = TRUE)
+        sd_x <- sd(x, na.rm = TRUE)
+        n_x <- sum(!is.na(x))
+        t_score <- (mean_x - 0) / (sd_x / sqrt(n_x))  # Assuming population mean is 0
+        return(t_score)
+    })
+    t_scores
+```
+
+What do those values mean logically?
+
+- The confidence intervals provide a range of values within which we can be reasonably confident that the true population mean lies, based on our sample data. A wider interval indicates more uncertainty, while a narrower interval suggests more precision in our estimate.
+- The t-scores indicate how many standard deviations the sample mean is from the hypothesized population mean (in this case, 0). A higher absolute t-score suggests that the sample mean is significantly different from the population mean, while a t-score close to 0 indicates that the sample mean is not significantly different from the population mean.
