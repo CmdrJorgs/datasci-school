@@ -66,13 +66,13 @@ Compute the Cosine Similarity between the same two variables as you used for #2.
     cosine_similarity <- sum(travel_insurance$Duration * travel_insurance$Commisioninvalue) / 
                          (sqrt(sum(travel_insurance$Duration^2)) * sqrt(sum(travel_insurance$Commisioninvalue^2)))
     cosine_similarity
-    # Plot Duration vs Commission
+    # Plot the cosine similarity
     plot(travel_insurance$Duration, travel_insurance$Commisioninvalue, 
-         main = "Duration vs Commission", 
+         main = paste("Duration vs. Commission (Cosine Similarity =", round(cosine_similarity, 4), ")"), 
          xlab = "Duration", 
-         ylab = "Commission", 
+         ylab = "Commission in Value", 
          pch = 19, 
-         col = "blue")
+         col = "blue")     
 ```
 
 ## Confidence Intervals
@@ -81,9 +81,11 @@ Compute the average confidence interval for each numeric feature.
 ```{r confidence_intervals}
     # Compute confidence intervals for each numeric feature
     confidence_intervals <- sapply(numeric_data, function(x) {
+        # Calculate mean, standard deviation, and sample size
         mean_x <- mean(x, na.rm = TRUE)
         sd_x <- sd(x, na.rm = TRUE)
         n_x <- sum(!is.na(x))
+        # Calculate the margin of error for a 95% confidence interval
         error_margin <- qt(0.975, df = n_x - 1) * (sd_x / sqrt(n_x))
         lower_bound <- mean_x - error_margin
         upper_bound <- mean_x + error_margin
@@ -93,19 +95,69 @@ Compute the average confidence interval for each numeric feature.
 ```
 
 Compute the t-scores for each numeric feature.
+
+First, let's brainstorm some hypotheses to test:
+
+- Do people who buy insurance tend to travel longer?
+  - H₀: The mean Duration is the same for customers who filed a claim on their insurance and those who did not.
+  - H₁: The mean Duration differs between the two groups.
+- Is there a gender difference in commission amounts?
+  - H₀: The mean Commisioninvalue is equal for male and female customers.
+  - H₁: The mean Commisioninvalue differs by gender.
+- Does trip duration relate to commission value?
+  - H₀: p = 0 (no correlation)
+  - H₁: p ≠ 0 (some correlation)
+
+Let's do a two-sample t-test comparing each numeric variable between customers who filed a claim on their insurance vs. those who did not.
+
 ```{r t_scores}
-    # Compute t-scores for each numeric feature
-    t_scores <- sapply(numeric_data, function(x) {
-        mean_x <- mean(x, na.rm = TRUE)
-        sd_x <- sd(x, na.rm = TRUE)
-        n_x <- sum(!is.na(x))
-        t_score <- (mean_x - 0) / (sd_x / sqrt(n_x))  # Assuming population mean is 0
-        return(t_score)
-    })
+    # Two-sample t-test for Duration by Insurance Claim
+    t_test_duration <- t.test(Duration ~ Claim, data = travel_insurance)
+    # Two-sample t-test for NetSales by Insurance Claim
+    t_test_netsales <- t.test(NetSales ~ Claim, data = travel_insurance)
+    # Two-sample t-test for Commisioninvalue by Insurance Claim
+    t_test_commision <- t.test(Commisioninvalue ~ Claim, data = travel_insurance)
+    # Two-sample t-test for Age by Insurance Claim
+    t_test_age <- t.test(Age ~ Claim, data = travel_insurance)
+    # Extract t-scores
+    t_scores <- c(t_test_duration$statistic, t_test_netsales$statistic, t_test_commision$statistic, t_test_age$statistic)
     t_scores
 ```
 
 What do those values mean logically?
 
-- The confidence intervals provide a range of values within which we can be reasonably confident that the true population mean lies, based on our sample data. A wider interval indicates more uncertainty, while a narrower interval suggests more precision in our estimate.
-- The t-scores indicate how many standard deviations the sample mean is from the hypothesized population mean (in this case, 0). A higher absolute t-score suggests that the sample mean is significantly different from the population mean, while a t-score close to 0 indicates that the sample mean is not significantly different from the population mean.
+**Confidence Interval**
+
+| Feature           | Lower | Upper |
+| ----------------- | ----- | ----- |
+| Duration          | 48.52 | 50.11 |
+| NetSales          | 40.32 | 41.08 |
+| Commisioninvalue  | 9.66  | 9.96  |
+| Age               | 39.86 | 40.08 |
+
+For duration, the interval 48.52 to 50.11 means:
+
+- The sample mean is around 49.3 days.
+- Given the sample size and variability, the true population mean is plausibly somewhere between 48.5 and 50.1.
+- The interval is fairly narrow, so the estimate is precise.
+
+All the intervals are quite tight, so we can be confident that the results have high precision.
+
+**T-Scores**
+
+| Feature           | t-score |
+| ----------------- | ------- |
+| Duration          | -13.38  |
+| NetSales          | -17.76  |
+| Commisioninvalue  | -15.21  |
+| Age               | 2.90    |
+
+The t-scores indicate how many standard deviations the sample means are apart between the two groups (those who filed a claim vs. those who did not).
+
+- For Duration, NetSales, and Commisioninvalue, the t-scores are large in magnitude and negative, suggesting that the group that filed a claim has significantly lower values for these features compared to those who did not file a claim.
+    - For Duration, a t-score of -13.38 indicates a very strong difference in trip duration between the two groups, with claim filers having shorter trips on average.
+    - For NetSales, a t-score of -17.76 suggests that policies with claims have significantly lower net sale value compared to non-claim policies.
+    - For Commisioninvalue, a t-score of -15.21 indicates that policies with claims correlated with significantly lower commissions than policies that did not have claims.
+- For Age, the t-score is positive and smaller in magnitude, suggesting that the group that filed a claim may be slightly older on average than those who did not file a claim, but the difference is less pronounced than for the other features.
+
+Overall, the t-scores suggest that there are significant differences in Duration, NetSales, and Commisioninvalue between the two groups, while the difference in Age is less significant.
