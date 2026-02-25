@@ -1,0 +1,97 @@
+---
+title: "DSC 520 Exercise 9"
+author: "David Jorgensen"
+date: "2026-02-22"
+output:
+  html_document:
+    theme: cosmo
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+```{r libraries}
+library(ggplot2)
+library(AICcmodavg)
+
+# Load assets/travel_insurance.csv
+travel_insurance <- read.csv("C:\\temp\\git\\datasci-school\\520\\travel_insurance.csv")
+# Remove spaces and punctuation from column names
+colnames(travel_insurance) <- gsub("[[:space:][:punct:]]", "", colnames(travel_insurance))
+# Print column names to verify changes
+colnames(travel_insurance)
+```
+
+# Exercise 9
+
+Using the travel insurance dataset from the prior week, create both one-way and two-way ANOVA. Use AIC to determine which one is better for the dataset.
+
+My research question: Does age affect travel destination and which agency the traveller books with?
+Hypothesis:
+- Null hypothesis (H0): There is no difference in agency and travel destination based on age.
+- Alternative hypothesis (H1): There is a difference in agency and travel destination based on age.
+
+Let's perform one-way ANOVA for both agency and destination, and then a two-way ANOVA to see if there is an interaction effect between agency and destination on age. Finally, we will compare the models using AIC to determine which one is better for the dataset. (Note: Because there are far too many possible destinations, performing a two-way ANOVA with interaction between agency and destination would be computationally intensive and may not be meaningful, so we will only include the main effects of agency and destination in the two-way ANOVA model.)
+
+```{r anova}
+    # One-way ANOVA: Age as the response variable and Agency as the factor
+    one_way_anova_agency <- aov(Age ~ Agency, data = travel_insurance)
+    summary(one_way_anova_agency)
+
+    # One-way ANOVA: Age as the response variable and Destination as the factor
+    one_way_anova_destination <- aov(Age ~ Destination, data = travel_insurance)
+    summary(one_way_anova_destination)
+    
+    # Two-way ANOVA: Age as the response variable and Agency and Destination as factors
+    two_way_anova <- aov(Age ~ Agency + Destination, data = travel_insurance)
+    summary(two_way_anova)
+
+    # Compare AIC values
+    aic_one_way_agency <- AIC(one_way_anova_agency)
+    aic_one_way_destination <- AIC(one_way_anova_destination)
+    aic_two_way <- AIC(two_way_anova)
+```
+
+With AIC calculated, we can compare the models to determine which one is better for the dataset. The model with the lowest AIC value is considered the best fit for the data, as it balances model complexity and goodness of fit.
+
+```{r aic_comparison}
+    # Print AIC values for comparison
+    cat("AIC for one-way ANOVA (Agency):", aic_one_way_agency, "\n")
+    cat("AIC for one-way ANOVA (Destination):", aic_one_way_destination, "\n")
+    cat("AIC for two-way ANOVA:", aic_two_way, "\n")
+
+    # compare the information value of each model and choose the one with the lowest AIC value
+    model.set <- list(one_way_anova_agency, one_way_anova_destination, two_way_anova)
+    model.names <- c("One-way ANOVA (Agency)", "One-way ANOVA (Destination)", "Two-way ANOVA")
+    aictab(model.set, modnames = model.names)
+
+    # Determine which model is better based on AIC
+    if (aic_one_way_agency < aic_one_way_destination && aic_one_way_agency < aic_two_way) {
+      cat("The one-way ANOVA (Agency) is better (lower AIC value)\n")
+    } else if (aic_one_way_destination < aic_two_way) {
+      cat("The one-way ANOVA (Destination) is better (lower AIC value)\n")
+    } else {
+      cat("The two-way ANOVA is better (lower AIC value)\n")
+    }
+```
+
+With the lowest AIC value of 475814 and an AIC weight of 100%, the two-way ANOVA model is the best fit for the data. This suggests that both agency and destination have a significant impact on age, and the interaction between these two factors is important in explaining the variation in age among travelers.
+
+As a sanity check, we can also check for homoscedasticity by plotting the residuals of each model. If the residuals are randomly scattered around zero with no clear pattern, it suggests that the assumption of homoscedasticity is met.
+```{r homeoscedasticity}
+    # Check for homoscedasticity using plot()
+    par(mfrow = c(2, 2))
+    plot(one_way_anova_agency, main = "One-way ANOVA (Agency)") # Residuals vs Fitted for one-way ANOVA (Agency)
+    par(mfrow = c(1, 1)) # Reset plotting area
+    par(mfrow = c(2, 2))
+    plot(one_way_anova_destination, main = "One-way ANOVA (Destination)") # Residuals vs Fitted for one-way ANOVA (Destination)
+    par(mfrow = c(1, 1)) # Reset plotting area
+    par(mfrow = c(2, 2))
+    plot(two_way_anova, main = "Two-way ANOVA") # Residuals vs Fitted for two-way ANOVA
+    par(mfrow = c(1, 1)) # Reset plotting area
+```
+
+The two-way ANOVA model has the most consistent Q-Q slope, and a fairly wide spread of residuals around the fitted line, suggesting that the assumption of homoscedasticity is reasonably met for this model. The one-way ANOVA models show more variability in the residuals, which may indicate some issues with homoscedasticity. Overall, the two-way ANOVA model appears to be the best fit for the data based on both AIC and the homoscedasticity check.
