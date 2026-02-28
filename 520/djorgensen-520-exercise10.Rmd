@@ -1,0 +1,222 @@
+---
+title: "DSC 520 Exercise 10"
+author: "David Jorgensen"
+date: "2026-02-29"
+output:
+  html_document:
+    theme: cosmo
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+# Exercise 10: Building a Multiple Regression Model to Predict Housing Prices
+
+## Data Preparation and Exploration
+
+Loading the libraries needed for this analysis:
+
+```{r libraries}
+library(ggplot2)
+library(dplyr)
+library(broom)
+library(ggpubr)
+library(scales)
+```
+
+Loading the dataset:
+
+```{r load_data}
+# Load assets/travel_insurance.csv
+housing_prices <- read.csv("C:\\temp\\git\\datasci-school\\520\\Housing.csv")
+# Verify it's loaded correctly
+summary(housing_prices)
+```
+
+Exploring the data to check assumptions for linear regression:
+
+```{r data_exploration}
+# Check if the dependent variable follows a normal distribution
+ggplot(housing_prices, aes(x = price)) +
+  geom_histogram(binwidth = 500000, fill = "blue", color = "black") +
+  scale_x_continuous(labels = label_number(scale_cut = cut_short_scale())) +
+  labs(title = "Distribution of Sale Price", x = "Sale Price", y = "Frequency")
+# Check linearity between...
+# area and price
+ggplot(housing_prices, aes(x = area, y = price)) +
+  geom_point() +
+  scale_x_continuous(labels = label_number(scale_cut = cut_short_scale())) +
+  scale_y_continuous(labels = label_number(scale_cut = cut_short_scale())) +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(title = "Scatter Plot of Area vs. Sale Price", x = "Area", y = "Sale Price")
+# bedrooms and price
+ggplot(housing_prices, aes(x = bedrooms, y = price)) +
+  geom_point() +
+  scale_y_continuous(labels = label_number(scale_cut = cut_short_scale())) +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(title = "Scatter Plot of Bedrooms vs. Sale Price", x = "Bedrooms", y = "Sale Price")
+# bathrooms and price
+ggplot(housing_prices, aes(x = bathrooms, y = price)) +
+  geom_point() +
+  scale_y_continuous(labels = label_number(scale_cut = cut_short_scale())) +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(title = "Scatter Plot of Bathrooms vs. Sale Price", x = "Bathrooms", y = "Sale Price")
+# stories and price
+ggplot(housing_prices, aes(x = stories, y = price)) +
+  geom_point() +
+  scale_y_continuous(labels = label_number(scale_cut = cut_short_scale())) +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(title = "Scatter Plot of Stories vs. Sale Price", x = "Stories", y = "Sale Price")
+```
+
+## Instructions
+
+Using the Housing Prices Dataset, use your skills in statistical correlation, multiple regression, and R programming, to build a regression model to infer Sale Price. This is referred to as “price” in the dataset.
+
+Complete the following tasks:
+
+- Explain any transformations or modifications you made to the dataset.
+- Create a linear regression model where “area” infers price (i.e., area is used to predict price).
+- Get a summary of your first model and explain your results (e.g., R2, adj R2, RMSE, MSE).
+- Get the residuals of your model (you can use 'resid' or 'residuals' functions) and plot them. What does the plot tell you about your predictions?
+- Use a qq plot to observe your residuals. Do your residuals meet the normality assumption?
+- Create a linear regression model that uses multiple predictor variables to predict Sale Price (feel free to derive new predictors from existing ones). Explain why you think each of these variables may add explanatory value to the model.
+- Get a summary of this GLM and explain your results.
+- Get the residuals of your second model (you can use 'resid' or 'residuals' functions) and plot them. What does the plot tell you about your predictions?
+- Use a qq plot to observe your residuals. Do your residuals meet the normality assumption?
+- Compare the results (e.g., R2, adj R2, RMSE, MSE) between your first and second model. Does your new model show an improvement over the first? To confirm a "significant" improvement between the second and first model, use ANOVA to compare them. What are the results?
+
+## Assignment
+
+### Explain any transformations or modifications you made to the dataset.
+
+No modifications or transformations were made to the dataset. I used the original variables as they were provided to build the regression models.
+
+### Create a linear regression model where “area” infers price (i.e., area is used to predict price).
+
+```{r area_regression}
+# Check homoscedasticity by plotting residuals vs fitted values
+area_regression <- lm(price ~ area, data = housing_prices)
+```
+
+### Get a summary of your first model and explain your results (e.g., R2, adj R2, RMSE, MSE).
+
+```{r area_regression_summary}
+# Get summary of the area regression model
+area_summary <- summary(area_regression)
+area_summary
+```
+
+Area matters, but explains only 28.7% of the variation in price. Both coefficients are highly significant (p < 2e‑16). For every 1-unit increase in area, the model predicts price increases by $462. Adjusted R² is nearly identical, meaning the model is stable but limited. On average, predictions are off by about $1.58M, which suggests price variation is huge in the dataset and that area alone is not enough to predict price well. 
+
+### Get the residuals of your model (you can use 'resid' or 'residuals' functions) and plot them. What does the plot tell you about your predictions?
+
+```{r area_residuals_plot}
+# Plot residuals
+ggplot(data = NULL, aes(x = fitted(area_regression), y = resid(area_regression))) +
+  geom_point() +
+  scale_x_continuous(labels = label_number(scale_cut = cut_short_scale())) +
+  scale_y_continuous(labels = label_number(scale_cut = cut_short_scale())) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  labs(title = "Residuals vs Fitted Values for Area Model", x = "Fitted Values", y = "Residuals")
+```
+
+The residuals plot shows a clear pattern, with residuals increasing in magnitude as fitted values increase. This suggests heteroscedasticity, meaning the variance of the residuals is not constant across all levels of fitted values. This violates one of the key assumptions of linear regression and indicates that the model may not be capturing all the relevant factors influencing price.
+
+### Use a qq plot to observe your residuals. Do your residuals meet the normality assumption?
+
+```{r area_qqplot}
+qqnorm(resid(area_regression))
+qqline(resid(area_regression), col = "red")
+```
+
+The qq plot shows that the residuals follow the normal distribution closely, except for some deviation in the right tail. This indicates that the normality assumption is mostly met, though not perfectly. The presence of some outliers or extreme values may be contributing to the deviation in the right tail, but overall, the residuals do not show severe departures from normality.
+
+### Create a linear regression model that uses multiple predictor variables to predict Sale Price (feel free to derive new predictors from existing ones). Explain why you think each of these variables may add explanatory value to the model.
+
+```{r multiple_regression}
+# Create a linear regression model where all variables are used to predict price
+full_model <- lm(price ~ ., data = housing_prices)
+```
+
+I included all available predictor variables (area, bedrooms, bathrooms, stories, etc.) in the multiple regression model. I believe each of these variables adds explanatory value because:
+
+- Area is a fundamental factor in determining house price.
+- Bedrooms and bathrooms are important because they directly relate to the functionality and desirability of a home.
+- Stories can also influence price as multi-story homes may be more expensive due to their design and potential for more living space.
+- Basement and parking can also add value as they provide additional usable space and convenience, which can increase the overall price of the house.
+- Hot water heating and air conditioning can also be important features that influence price, as they contribute to the comfort and livability of the home.
+- Furnished status may also impact price, as furnished homes can be more attractive to certain buyers and may command a higher price.
+- Preferred area and main road proximity can also influence price, as homes in preferred areas or far from noise pollution may be more desirable and thus more expensive.
+
+### Get a summary of this GLM and explain your results.
+
+```{r multiple_regression_summary}
+# Get summary of the full regression model
+full_summary <- summary(full_model)
+full_summary
+```
+
+Significant variables:
+
+- area (244 per sq ft) — still strongly significant, but the effect size drops from 462 → 244 once other features are accounted for.
+- bathrooms (≈ +988k) — one of the strongest predictors. Houses with more bathrooms are dramatically more expensive, even after controlling for area and bedrooms.
+- stories (≈ +451k) — additional stories add substantial value.
+- airconditioningyes (≈ +865k) — very large premium for AC.
+- prefareayes (≈ +652k) — preferred area is a major price driver.
+- basement, guestroom, and main road also add meaningful value.
+- unfurnished status (p = 0.001) — cheaper by ~411k relative to the baseline.
+
+Non-significant variables:
+
+- bedrooms (p = 0.11) — once area and bathrooms are accounted for, bedroom count adds little unique information.
+- Furnishing status semi-furnished (p = 0.69).
+
+Residuals now range from about –2.6M to +5.2M, much tighter than the simple area model. The Residual Standard Error = 1.068M, down from 1.58M in the area‑only model. That’s a 33% reduction in typical prediction error.
+
+R² = 0.682, meaning the model explains 68.2% of the variance in price, a huge improvement over the 28.7% from the area‑only model. Adjusted R² = 0.674, indicating that the additional predictors are adding real explanatory power without just overfitting. The F‑statistic = 87.52, p < 2.2e‑16, confirms that the full model is highly significant as a whole.
+
+### Get the residuals of your second model (you can use 'resid' or 'residuals' functions) and plot them. What does the plot tell you about your predictions?
+
+```{r full_residuals_plot}
+# Plot residuals for the full model
+ggplot(data = NULL, aes(x = fitted(full_model), y = resid(full_model))) +
+  geom_point() +
+  scale_x_continuous(labels = label_number(scale_cut = cut_short_scale())) +
+  scale_y_continuous(labels = label_number(scale_cut = cut_short_scale())) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  labs(title = "Residuals vs Fitted Values for Full Model", x = "Fitted Values", y = "Residuals")
+```
+
+The residuals plot for the full model shows a much more random scatter around the horizontal line at zero, with no clear pattern or funnel shape. This suggests that the full model has addressed the heteroscedasticity issue observed in the area‑only model, and the variance of the residuals is more constant across different levels of fitted values. This indicates that the full model is a better fit for the data and provides more reliable predictions.
+
+### Use a qq plot to observe your residuals. Do your residuals meet the normality assumption?
+
+```{r full_qqplot}
+qqnorm(resid(full_model))
+qqline(resid(full_model), col = "red")
+```
+
+The qq plot for the full model's residuals shows a less close alignment with the normal distribution at the tails, but it's still reasonably close to normality. The central portion of the residuals follows the normal distribution well, while there are some deviations in the tails, particularly on the right side. This suggests that while the normality assumption is not perfectly met, it is still reasonably satisfied for the purposes of linear regression. The presence of some outliers or extreme values may be contributing to the deviations in the tails, but overall, the residuals do not show severe departures from normality.
+
+### Compare the results (e.g., R2, adj R2, RMSE, MSE) between your first and second model. Does your new model show an improvement over the first? To confirm a "significant" improvement between the second and first model, use ANOVA to compare them. What are the results?
+
+```{r model_comparison}
+# Compare R² and adjusted R²
+cat("First model R²:", summary(area_regression)$r.squared, "\n")
+cat("Second model R²:", summary(full_model)$r.squared, "\n")
+cat("First model adj R²:", summary(area_regression)$adj.r.squared, "\n")
+cat("Second model adj R²:", summary(full_model)$adj.r.squared, "\n")
+
+# Compare RMSE and MSE
+cat("First model RMSE:", sqrt(mean(resid(area_regression)^2)), "\n")
+cat("Second model RMSE:", sqrt(mean(resid(full_model)^2)), "\n")
+
+# ANOVA to test if the full model is significantly better than the area-only model
+anova(area_regression, full_model)
+```
+
+The full model shows a significant improvement over the area-only model, with a much higher R² (0.682 vs 0.287) and a much lower RMSE (1.054M vs 1.578M). The ANOVA test confirms that the full model provides a significantly better fit to the data than the area-only model, with a p-value < 2.2e‑16, indicating that the additional predictors add significant explanatory power to the model. The RSS drops by over 55%, and the F‑statistic is extremely large. This confirms that the full model is a much better representation of the underlying data and provides more accurate predictions of house prices.
