@@ -4,3 +4,6 @@
 *.html
 *.pdf
 *.csv
+
+# Large GeoPackage files
+gpkg
