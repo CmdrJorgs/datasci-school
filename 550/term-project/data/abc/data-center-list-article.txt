@@ -1,0 +1,61 @@
+Box Elder County
+
+The large-scale data center planned in Box Elder County by O’Leary Digital, backed by reality TV star Kevin O’Leary, was approved by the Box Elder County Commission on May 4. The proposal was previously approved by the Military Installation Development Authority, and it is titled the Stratos Project.
+
+It will be built in a rural area south of US-84 near the Idaho border, and reportedly, the project is designed to reuse water and feed it back into the Great Salt Lake. It will cover more than 40,000 acres, making it one of the largest data centers in the world when complete. According to executive director of the Utah Department of Natural Resources Joel Ferry, this is just the first of a multi-phase process, and it likely won’t be in operation for ten years.
+
+This project in particular has generated massive backlash from the public over its fast timeline and environmental concerns, and investor Kevin O’Leary responded, saying that he is aware of those concerns. He also said that the data center will use the “best technology,” combining air and water cooling, and that it will combine power generation from solar, wind, and batteries.
+
+West Jordan
+
+The majority of data centers that are currently up and running are located in West Jordan. These centers are run by Novva, Oracle, and Aligned.
+
+The Novva Salt Lake City campus is a hyperscale data center that offers colocation and AI services in West Jordan. According to the Novva website, they are currently the largest data center in Utah, though that is set to change as other locations in development come online. It spans 100 acres with four buildings, and its servers are cooled using air rather than water.
+
+The Oracle West Jordan Data center runs Oracle AI database with Google Cloud, allowing clients to build apps within Google Cloud Services using the Oracle AI database. It runs on the Oracle Cloud Infrastructure, which means that users and clients can access their services from any location.
+
+The Aligned Salt Lake City Data Center in West Jordan reportedly offers scalable and adaptive infrastructure for AI and Cloud services. According to the Aligned website, the campus is 55 acres, and reportedly, it is completely powered by renewable energy.
+
+Provo
+
+The AI data center planned for Provo by B+F Timpanogos is in a bit of limbo right now. It was proposed to turn an empty warehouse in Provo’s East Bay into a two-story AI data center, only nine acres in size. The project needed the Provo City Council to approve a rezoning of the land, but in February, the council voted unanimously against that rezoning.
+
+Members of the council said that they are not completely against this data center, but it’s a long-term decision, so they wanted to wait until they have the Provo Economic Plan before deciding one way or another.
+Eagle Mountain
+
+The Meta Eagle Mountain Data Center broke ground in 2018, and according to Meta, it currently employs over 300 people. It is a large, multi-building campus. Meta also says that it prioritizes the local community by offering grants to local schools and non-profits, minimizing its water use, and focusing on restoring water to local watersheds.
+
+The QTS data center in Eagle Mountain is going to be another multi-building campus once it is complete. It is currently under construction, and in April, crews placed the final beam on the third building. Five total are planned. The campus spans 193 acres and reportedly will support more than 100 permanent jobs once completed.
+Nephi
+
+BluSky AI entered into a non-binding agreement in September 2025 to lease a location in Nephi to become a modular, scalable AI data center. It appears to still be in the planning phases of development.
+
+Santaquin
+
+The city of Santaquin approved the Summit Ridge Data center back in 2024, and in January of this year, an open house was held to answer questions residents had about the project. It reportedly will utilize a closed-loop water system, and it will not be connected to the grid. Instead, it will generate its own power using natural gas generators.
+
+Duchesne County
+
+The Nine Mile Data Center, also known as the Uinta Basin Data Center, is planned by Energence Utah, LLC to be a large-scale data center around 6 miles southwest of Myton. It is located near Wells Draw and South Myton Bench, but a specific project footprint has not yet been provided.
+
+The project will use 475 acres of a larger plot for the campus, and it is planning to be operational by 2029. According to the Uintah Basin Project Information website, there will be roughly 200 long-term jobs created, and about $74.7 million in annual property tax revenue. Reportedly, the project will recycle water and limit its use of culinary water, and it plans to build solar and natural gas power plants on the campus.
+
+On April 2, the Duchesne County Planning Commission approved the project’s conditional-use permits. Several residents appealed the decision, and on April 27, after an appeal hearing, the commission denied the appeals.
+
+Delta
+
+There are two massive, hyperscale data center campuses under development in Delta. The first is under active development by Joule Power, and when phase 1 is completed, it will be a 4,000-acre AI data center campus spanning six facilities.
+
+It is expected to begin delivering AI services in Q4 2026, with a capability of 455 megawatts. That initial power will be generated by equipment on-site However, by 2032, they are planning to use nuclear power to up that capacity to 12 gigawatts.
+
+According to Joule Power’s website, they own 10,000 acre-feet of deeded water rights, and they say that their facility will use 90% less water than traditional facilities because of advanced water recovery systems.
+
+The second project in Delta boasts that it will be the largest data center campus in the world when it is completed. The ‘gigasite’ from Creekstone Energy is currently being constructed, and Creekstone Energy says that it will have a capacity of more than 10 gigawatts when completed.
+
+According to Creekstone Energy’s website, this campus is the “complete solution,” meaning that they will build the data center with “integrated, behind-the-meter” generation. Power grids simply weren’t built to support the high levels of electricity needed for AI data centers, the company plans to use solar energy to help supplant power for the campus. They also have plans to build other energy infrastructure in the area, including geothermal, wind, and nuclear sources.
+
+Iron County
+
+The Antelope Data Center is currently planned to be 640-acres in size. It was proposed to be built on unincorporated land several miles west of Cedar City by Pronghorn Development, LLP. The Iron County Planning Commission held a public hearing on the project in March of this year, and no decision was made during that hearing. The purpose of the hearing was only to gather comments.
+
+This project plans to create 670 jobs on-site at the facility, according to information put out by the Iron County Planning Commission. It also plans to generate its own electricity using natural gas generators so as to not draw on the local power grid, and it will reportedly use a closed-loop system for cooling its servers. 
