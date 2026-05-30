@@ -6,5 +6,8 @@
 	],
 	"settings": {
 		"r.lsp.promptToInstall": false
-	}
+	},
+  	"vscode_custom_css.imports": [
+    	"file:///home/djorgs/.vscode/extensions/webrender.synthwave-x-fluoromachine-0.0.14/synthwave-x-fluoromachine.css"
+    ]
 }
