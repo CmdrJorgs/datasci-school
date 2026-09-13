@@ -1,0 +1,144 @@
+/* The Second Rent -- one visual system across all three mediums.
+   David Jorgensen | DSC 640 Term Project */
+
+@font-face { font-family: "Merriweather"; font-weight: 400;
+  src: url("../../tsa/fonts/Merriweather-400.ttf") format("truetype"); }
+@font-face { font-family: "Merriweather"; font-weight: 700;
+  src: url("../../tsa/fonts/Merriweather-700.ttf") format("truetype"); }
+@font-face { font-family: "Source Sans 3"; font-weight: 400;
+  src: url("../../tsa/fonts/SourceSans3-400.ttf") format("truetype"); }
+@font-face { font-family: "Source Sans 3"; font-weight: 600;
+  src: url("../../tsa/fonts/SourceSans3-600.ttf") format("truetype"); }
+@font-face { font-family: "Source Sans 3"; font-weight: 700;
+  src: url("../../tsa/fonts/SourceSans3-700.ttf") format("truetype"); }
+
+:root {
+  --ink:    #163a48;
+  --mid:    #5c8a9b;
+  --muted:  #93b3bd;
+  --pale:   #c3d4da;
+  --wash:   #e9eef1;
+  --paper:  #faf9f7;
+  --rule:   #d9dedd;
+  --accent: #bf5a3f;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* ---------------------------------------------------------- structure */
+
+.sheet {
+  position: relative;
+  background: var(--paper);
+  overflow: hidden;
+  page-break-after: always;
+}
+.sheet:last-child { page-break-after: auto; }
+
+.sheet.portrait { width: 8.5in; height: 11in; padding: 0.55in 0.62in 0.48in; }
+.sheet.landscape { width: 11in; height: 8.5in; padding: 0.42in 0.5in 0.38in; }
+
+.runner {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 7.2pt; letter-spacing: 0.13em; text-transform: uppercase;
+  color: var(--mid); border-bottom: 0.5pt solid var(--rule);
+  padding-bottom: 5pt; margin-bottom: 15pt;
+}
+.runner strong { color: var(--ink); font-weight: 700; }
+
+/* ---------------------------------------------------------- type */
+
+.kicker {
+  font-size: 7.4pt; letter-spacing: 0.19em; text-transform: uppercase;
+  color: var(--accent); font-weight: 700;
+}
+h1 {
+  font-family: "Merriweather", Georgia, serif; font-weight: 700;
+  font-size: 27pt; line-height: 1.14; letter-spacing: -0.008em;
+  margin: 7pt 0 0;
+}
+h2 {
+  font-family: "Merriweather", Georgia, serif; font-weight: 700;
+  font-size: 12.5pt; line-height: 1.25; margin: 0 0 3pt;
+}
+h3 {
+  font-size: 8pt; letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--mid); font-weight: 700; margin-bottom: 5pt;
+}
+p { font-size: 9.6pt; line-height: 1.52; }
+.deck { font-size: 11pt; line-height: 1.45; color: var(--mid); margin-top: 8pt; }
+.small { font-size: 8.2pt; line-height: 1.45; color: var(--mid); }
+
+.tick {
+  display: inline-block; width: 16pt; height: 2.5pt;
+  background: var(--accent); margin-bottom: 6pt;
+}
+hr.rule { border: 0; border-top: 0.5pt solid var(--rule); margin: 13pt 0; }
+
+/* ---------------------------------------------------------- figures */
+
+figure { margin: 0; }
+figure img { display: block; width: 100%; height: auto; }
+figcaption {
+  font-size: 7.8pt; line-height: 1.42; color: var(--mid);
+  margin-top: 4pt; padding-top: 4pt; border-top: 0.5pt solid var(--rule);
+}
+figcaption b { color: var(--ink); font-weight: 600; }
+
+/* ---------------------------------------------------------- stats */
+
+.hero-number {
+  font-family: "Merriweather", Georgia, serif; font-weight: 700;
+  font-size: 52pt; line-height: 0.92; letter-spacing: -0.02em;
+}
+.stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14pt; }
+.stat {
+  border-top: 2pt solid var(--ink); padding-top: 6pt;
+}
+.stat .val {
+  font-family: "Merriweather", Georgia, serif; font-weight: 700; font-size: 18pt;
+  line-height: 1;
+}
+.stat .lab { font-size: 8pt; line-height: 1.4; color: var(--mid); margin-top: 4pt; }
+
+.source {
+  position: absolute; left: 0.62in; right: 0.62in; bottom: 0.34in;
+  font-size: 6.9pt; line-height: 1.4; color: var(--mid);
+  border-top: 0.5pt solid var(--rule); padding-top: 5pt;
+}
+.sheet.landscape .source { left: 0.5in; right: 0.5in; bottom: 0.26in; }
+
+/* ---------------------------------------------------------- callouts */
+
+.callouts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13pt; }
+.callout { display: flex; gap: 7pt; }
+.callout .num {
+  flex: 0 0 13pt; height: 13pt; border-radius: 50%;
+  background: var(--ink); color: var(--paper);
+  font-size: 7.6pt; font-weight: 700; line-height: 13pt; text-align: center;
+}
+.callout .txt { font-size: 8pt; line-height: 1.42; color: var(--mid); }
+.callout .txt b { color: var(--ink); font-weight: 600; display: block; }
+
+/* ---------------------------------------------------------- panels */
+
+.panel {
+  background: #f2f0ec; border-left: 2.5pt solid var(--accent);
+  padding: 10pt 12pt;
+}
+.panel h3 { color: var(--accent); }
+.panel p { font-size: 8.3pt; line-height: 1.48; }
+
+.pull {
+  font-family: "Merriweather", Georgia, serif; font-weight: 700;
+  font-size: 12.5pt; line-height: 1.36; color: var(--ink);
+  border-left: 2.5pt solid var(--accent); padding-left: 11pt;
+}
