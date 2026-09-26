@@ -36,35 +36,41 @@ df = pd.read_csv(DATA_PATH)
 # Figure 1: Longitudinal Trajectories with Infrastructure Milestones
 # ==============================================================================
 def plot_figure_1():
-    fig, ax1 = plt.subplots(figsize=(12, 6.5), dpi=300)
+    fig, ax1 = plt.subplots(figsize=(12, 7.2), dpi=300)
     ax2 = ax1.twinx()
 
     # Highway VMT and Lane Miles on ax1
     l1, = ax1.plot(df['Year'], df['highway_vmt_urban_freeway'] / 1e3, color='#1f77b4', lw=2.5, marker='o', label='Freeway VMT (Billion Miles)')
-    l2, = ax1.plot(df['Year'], df['highway_lane_miles_freeway'] / 1e2, color='#aec7e8', lw=2.0, ls='--', marker='s', label='Freeway Lane-Miles (x100)')
+    l2, = ax1.plot(df['Year'], df['highway_lane_miles_freeway'] / 1e2, color='#aec7e8', lw=2.0, ls='--', marker='s', label='Freeway Lane-Miles (÷100)')
 
     # Transit PMT and VRM on ax2
     l3, = ax2.plot(df['Year'], df['transit_pmt_total'] / 1e6, color='#2ca02c', lw=2.5, marker='^', label='Transit PMT (Million Miles)')
     l4, = ax2.plot(df['Year'], df['transit_vrm_total'] / 1e6, color='#98df8a', lw=2.0, ls=':', marker='d', label='Transit VRM (Million Miles)')
 
-    # Milestone Annotations
+    # Milestone Annotations repositioned below chart with alternating vertical offsets
     milestones = [
-        (2002, 10.5, '2002 Winter Olympics\n(I-15 Recon. Complete)'),
-        (2008, 14.2, '2008 FrontRunner North\n& Legacy Pkwy Opens'),
-        (2012, 17.2, '2012 FrontRunner South\n& I-15 CORE Complete'),
-        (2018, 18.2, '2018 UVX BRT\nService Launch'),
-        (2020, 20.8, '2020 COVID-19 Shock\n(Telework Surge)'),
-        (2024, 23.1, '2024 West Davis Hwy\n(SR-177 Opens)')
+        (2002, '2002 Winter Olympics\n(I-15 Recon. Complete)', -0.12),
+        (2008, '2008 FrontRunner North\n& Legacy Pkwy Opens', -0.12),
+        (2012, '2012 FrontRunner South\n& I-15 CORE Complete', -0.23),
+        (2018, '2018 UVX BRT\nService Launch', -0.12),
+        (2020, '2020 COVID-19 Shock\n(Telework Surge)', -0.23),
+        (2024, '2024 West Davis Hwy\n(SR-177 Opens)', -0.12)
     ]
-    for yr, ypos, text in milestones:
+    for yr, text, y_pos in milestones:
         ax1.axvline(x=yr, color='gray', linestyle='--', alpha=0.45, zorder=1)
-        ax1.annotate(text, xy=(yr, ypos / 2.0), xytext=(yr + 0.25, (ypos / 2.0) + 0.4),
-                     fontsize=8, weight='bold', color='#333333',
-                     arrowprops=dict(arrowstyle='->', color='gray', lw=0.8),
-                     bbox=dict(boxstyle='round,pad=0.2', facecolor='#f9f9f9', edgecolor='#cccccc', alpha=0.85))
 
-    ax1.set_xlabel('Calendar Year', labelpad=8)
-    ax1.set_ylabel('Highway Metrics (VMT in Billions / Lane-Miles x100)', color='#1f77b4', labelpad=8)
+    trans = ax1.get_xaxis_transform()
+    for yr, text, y_pos in milestones:
+        ax1.annotate(text, xy=(yr, 0), xytext=(yr, y_pos),
+                     xycoords=trans, textcoords=trans,
+                     fontsize=7.5, weight='bold', color='#333333', ha='center', va='top',
+                     arrowprops=dict(arrowstyle='->', color='gray', lw=0.8),
+                     bbox=dict(boxstyle='round,pad=0.25', facecolor='#f9f9f9', edgecolor='#cccccc', alpha=0.9),
+                     annotation_clip=False)
+
+    # Added upper margin to x axis label so it is not overlapped by repositioned annotations
+    ax1.set_xlabel('Calendar Year', labelpad=110)
+    ax1.set_ylabel('Highway Metrics (VMT in Billions / Lane-Miles ÷100)', color='#1f77b4', labelpad=8)
     ax2.set_ylabel('Transit Metrics (PMT & VRM in Millions)', color='#2ca02c', labelpad=8)
 
     ax1.set_xlim(1999.5, 2024.5)
@@ -77,9 +83,8 @@ def plot_figure_1():
     ax1.legend(lines, labels, loc='upper left', framealpha=0.95, facecolor='white', edgecolor='#dddddd')
 
     plt.title('Figure 1: Longitudinal Travel Demand and Infrastructure Trajectories along the Wasatch Front (2000–2024)', pad=15)
-    plt.tight_layout()
     out_file = os.path.join(FIG_DIR, "figure_1_longitudinal_trajectories.png")
-    plt.savefig(out_file)
+    plt.savefig(out_file, bbox_inches='tight')
     plt.close()
     print(f"Saved: {out_file}")
 
@@ -112,7 +117,8 @@ def plot_figure_2():
     ax.plot(df['Year'], idx_vmt_pc, color='#9467bd', lw=2.0, ls=':', label=f'VMT per Capita (+{pct_vmt_pc:.1f}%)')
 
     ax.axhline(100, color='black', lw=1.0, ls='-', alpha=0.5)
-    ax.axvspan(2020, 2021.5, color='#ffe6e6', alpha=0.4, label='COVID-19 Pandemic Disruption')
+    # Darker COVID-19 pandemic disruption zone for improved contrast
+    ax.axvspan(2020, 2021.5, color='#ffb3b3', alpha=0.45, label='COVID-19 Pandemic Disruption')
 
     ax.set_xlabel('Calendar Year', labelpad=8)
     ax.set_ylabel('Index (Year 2000 = 100)', labelpad=8)
@@ -181,15 +187,16 @@ def plot_figure_3():
     ax.axhline(0, color='black', lw=1.0)
     ax.axhline(1.0, color='gray', ls='--', lw=1.2, label='Unit Elasticity (Duranton & Turner, 2011)')
 
-    for i, (b, c) in enumerate(zip(bars, coefs)):
-        y_text = c + (0.08 if c >= 0 else -0.12)
+    # Move number labels to just above each box plot / error bar (similar to Figure 5)
+    for i, (b, c, h) in enumerate(zip(bars, coefs, ci_high)):
+        y_text = h + 0.04
         ax.text(b.get_x() + b.get_width() / 2., y_text, f"{c:+.3f}",
-                ha='center', va='bottom' if c < 0 else 'top', fontsize=9, weight='bold')
+                ha='center', va='bottom', fontsize=9.5, weight='bold')
 
     ax.set_xticks(x_pos)
     ax.set_xticklabels(lags, weight='bold')
     ax.set_ylabel('Elasticity Coefficient (Δ ln VMT per Capita / Δ ln Lane-Miles)', labelpad=8)
-    ax.set_ylim(-0.6, 1.2)
+    ax.set_ylim(-0.6, 1.25)
     ax.grid(True, linestyle=':', alpha=0.6, axis='y')
     ax.legend(loc='upper left', framealpha=0.95, facecolor='white', edgecolor='#dddddd')
 
@@ -218,13 +225,16 @@ def plot_figure_4():
     ax1.set_ylim(0, 4.5)
     ax1.grid(True, linestyle=':', alpha=0.6)
     ax1.legend(loc='upper left', framealpha=0.9)
+    ax1.set_xlabel('Calendar Year', labelpad=8)
     ax1.set_title('Panel A: Regional Spine Transit Passenger-Throughput Share (2000–2024, Baseline = 0%)', fontsize=11)
 
     # Panel B: Chow Test F-Statistics Across Candidate Break Years
     years_tested = list(range(2005, 2022))
     f_stats = []
     p_vals = []
-    reg_df = df.dropna(subset=['d_ln_vmt_pc', 'd_ln_lanemiles', 'd_ln_emp', 'd_ln_gas_price']).copy()
+    reg_df = df.dropna(subset=['d_ln_vmt_pc', 'd_ln_lanemiles', 'd_ln_lanemiles_lag1', 
+                               'd_ln_lanemiles_lag2', 'd_ln_transit_vrm', 'd_ln_gas_price', 
+                               'd_ln_emp', 'd_covid']).copy()
     x_cols = ['d_ln_lanemiles', 'd_ln_emp', 'd_ln_gas_price']
 
     for byr in years_tested:
@@ -340,13 +350,13 @@ def plot_figure_5():
 
     # Add divider line between System-Wide and Peak Bottleneck
     ax2.axvline(1.5, color='gray', linestyle='--', alpha=0.6, lw=1.2)
-    ax2.text(0.5, 230, 'System-Wide Averages\n(25-Year Panel)', ha='center', fontsize=9, weight='bold', color='#333333')
-    ax2.text(2.5, 230, 'Peak Choke-Point Relief\n(Estimated Corridor Marginal)', ha='center', fontsize=9, weight='bold', color='#333333')
+    ax2.text(0.5, 248, 'System-Wide Averages\n(25-Year Panel)', ha='center', fontsize=9, weight='bold', color='#333333')
+    ax2.text(2.5, 248, 'Peak Choke-Point Relief\n(Estimated Corridor Marginal)', ha='center', fontsize=9, weight='bold', color='#333333')
 
     ax2.set_xticks(range(4))
     ax2.set_xticklabels(bar_labels, fontsize=8.5, weight='bold')
     ax2.set_ylabel('Public Capital Cost per Passenger-Mile (Cents / PMT)', labelpad=8)
-    ax2.set_ylim(0, 260)
+    ax2.set_ylim(0, 280)
     ax2.grid(True, linestyle=':', alpha=0.6, axis='y')
     ax2.set_title('Panel B: Capital Cost per PMT: System Average vs. Peak Choke-Point', fontsize=11)
 

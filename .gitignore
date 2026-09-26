@@ -7,3 +7,6 @@
 
 # Large GeoPackage files
 *.gpkg
+
+# Environment variables & secrets
+.env*
