@@ -1,5 +1,13 @@
+# Caches & temporary files
 *_cache
 /cache
+.cache
+__pycache__/
+*.py[cod]
+*$py.class
+.ipynb_checkpoints/
+
+# Generated export assets
 *.png
 *.html
 *.pdf
@@ -7,6 +15,20 @@
 
 # Large GeoPackage files
 *.gpkg
+
+# Model training checkpoints & heavy weights
+results/
+**/results/
+checkpoint-*/
+**/checkpoint-*/
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.onnx
+
+# Telemetry & crash logs
+.sentry-native/
 
 # Environment variables & secrets
 .env*
